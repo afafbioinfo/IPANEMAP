@@ -1,0 +1,35 @@
+@asaaidi_LIX 2018
+
+A directed sampling from the conformation space of secondary structures, followed by a clustering of the similar structures from  condition. The output is a set of accurate centroid structures verifying certain optimality criteria.
+Output centroids are in the folder "Multiprobing"
+
+Set-up issues:
+
+This version requires the use of:
+1- ViennaRNA-2.3.1, be sure to use a version above 2.0
+2- VARNAv3-93.jar should be in the working repository.
+
+
+Launch the program: python2.7 IPANEMAP.py
+
+***************************************************************Configuration: 
+IPANEMAP.Config: correponds to the configuration file
+
+Parameters that should be set:
+ -constraint, example: constraints: 1M7,1M7MG,NMIA
+ -numberofsruct: number of strcutures generqted for each condition, once the value is fixed a folder OutputSamples'numberofsruct' is created.
+
+***************************************************************Input folders:
+
+-Constraints_probing: contains constraint files with reactivity file. for each probing condition two files are required: RnaCondition.fa and RnaConditionProbing.txt where RnaCondition.fa: is a fasta file (sequence) with the identifier >Rnacondition(reagent name)
+
+-fasta_files: fasta file of the studied RNA Rna.fa
+
+-Constraints_Hard: Contains files with hard constraints
+
+*************************************************************Output folders:
+
+ - Multiprobing contains predicted structures in dot-bracket format
+ - output with all the clustering properties.
+ - logfile: Sampling, clustering and Pareto selection results.
+
