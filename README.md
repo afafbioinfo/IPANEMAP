@@ -1,8 +1,7 @@
 # IPANEMAP
 ### Integrative Probing Analysis of Nucleic Acids Empowered by Multiple Accessibility Profiles.
 
-A software for predicting stable RNA secondary structures compatibles from multiple chemical probing (SHAPE, DMS...)  reactivities profiles.
-The output is an optimal centroid structure.
+IPANEMAP is a software for predicting stable RNA secondary structures compatibles from multiple chemical probing (SHAPE, DMS...)  reactivities profiles. It outputs one or several secondary structures, corresponding to the conformers best supported by  experimental data and thermodynamics.
 
 ## Installing IPANEMAP
 
@@ -31,8 +30,7 @@ Parameters that should be set:
  - `Constraints_Hard`: Contains files with hard constraints
 
 ### Output folders
-
- - Multiprobing contains predicted structures (= optimal centroid structure) in dot-bracket format
- - output with all the clustering properties
- - logfile: Sampling, clustering and Pareto selection results
+ - `Multiprobing` contains predicted structures (= optimal centroid structure) in dot-bracket format
+ - `output` contains all the clustering properties
+ - `logfile` lists all informations pertaining the sampling, clustering and Pareto selection processes
 
