@@ -1,7 +1,6 @@
 @asaaidi_LIX 2018
 
-A directed sampling from the conformation space of secondary structures, followed by a clustering of the similar structures from  condition. The output is a set of accurate centroid structures verifying certain optimality criteria.
-Output centroids are in the folder "Multiprobing"
+
 
 Set-up issues:
 
