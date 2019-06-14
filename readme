@@ -4,7 +4,7 @@ IPANEMAP tool for an Integrative Probing Analysis of Nucleic Acids Empowered by 
 
 A sampling from the conformational space of RNA secondary structures, under different probing constraints, followed by an iterative clustering to find structures at the intersection of the various considered constraints.
 
-The output is a centroid structure that could be found in the folder "Multiprobing".
+The output is an optimal centroid structure.
 
 Set-up issues:
 
@@ -32,7 +32,7 @@ Parameters that should be set:
 
 *************************************************************Output folders:
 
- - Multiprobing contains predicted structures in dot-bracket format
+ - Multiprobing contains predicted structures (= optimal centroid structure) in dot-bracket format
  - output with all the clustering properties.
  - logfile: Sampling, clustering and Pareto selection results.
 
