@@ -15,7 +15,7 @@ IPANEMAP consists in a set of Python 2.7+ scripts, and requires the prior instal
 
 Once all dependencies are satisfied, IPANEMAP can be invoked through: 
 
-      `python2.7 IPANEMAP.py`
+      python2.7 IPANEMAP.py
 
 ### Configuration
 All configuration options are set by modifying the content of the `IPANEMAP.Config` file
