@@ -6,9 +6,9 @@ IPANEMAP is a software for predicting stable RNA secondary structures compatible
 ## Installing IPANEMAP
 
 IPANEMAP consists in a set of Python 2.7+ scripts, and requires the prior installation, and accessibility from the command line, of the following dependencies:
-1. `ViennaRNA` package, version posterior to 2.0
-2. `scikit-learn`, version posterior to x.y
-3. `VARNAv3-93.jar` should be found in the working repository
+1. `ViennaRNA` package, version posterior to 2.0, [downloadable from the TBI](https://www.tbi.univie.ac.at/RNA/#download "Download the Vienna package")
+2. `scikit-learn`, [version 0.2 for Python 2.7+](https://scikit-learn.org/stable/install.html "Download scikit-learn")
+3. `VARNAv3-93.jar` should be [downloaded from VARNA site](http://varna.lri.fr "Download VARNA"), and found in the working repository
 
 ## Executing IPANEMAP
 
