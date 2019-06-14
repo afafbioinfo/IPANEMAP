@@ -1,5 +1,5 @@
 # IPANEMAP
-Integrative Probing Analysis of Nucleic Acids Empowered by Multiple Accessibility Profiles.
+## Integrative Probing Analysis of Nucleic Acids Empowered by Multiple Accessibility Profiles.
 
 A software for predicting stable RNA secondary structures compatibles from multiple chemical probing (SHAPE, DMS...)  reactivities profiles.
 The output is an optimal centroid structure.
