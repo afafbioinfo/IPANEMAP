@@ -29,7 +29,7 @@ Parameters that should be set:
  - `fasta_files`: Fasta-format file of the studied RNA `Rna.fa`
  - `Constraints_Hard`: Contains files with hard constraints
 
-### Output folders:
+### Output folders
 
  - Multiprobing contains predicted structures (= optimal centroid structure) in dot-bracket format
  - output with all the clustering properties
