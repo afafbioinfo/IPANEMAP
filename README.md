@@ -15,7 +15,7 @@ IPANEMAP consists in a set of Python 2.7+ scripts, and requires the prior instal
 Once all dependencies are satisfied, IPANEMAP can be invoked through: 
   `python2.7 IPANEMAP.py`
 
-## Configuration
+### Configuration
 All configuration options are set by modifying the content of the `IPANEMAP.Config` file
 
 Parameters that should be set:
@@ -23,12 +23,12 @@ Parameters that should be set:
  Example: `constraints: 1M7,1M7MG,NMIA`
  - `numberofsruct`: number of structures generated for each condition, once the value is fixed a folder `OutputSamples{numberofsruct}` is created
 
-## Input folders
+### Input folders
  - `Constraints_probing`: contains constraint files with reactivity scores. For each probing condition, two files are required: `RnaCondition.fa` and `RnaConditionProbing.txt` where `RnaCondition.fa` is a `Fasta` format file (sequence) with the identifier `>Rnacondition(reagent name)`
  - `fasta_files`: Fasta-format file of the studied RNA `Rna.fa`
  - `Constraints_Hard`: Contains files with hard constraints
 
-## Output folders:
+### Output folders:
 
  - Multiprobing contains predicted structures (= optimal centroid structure) in dot-bracket format
  - output with all the clustering properties
