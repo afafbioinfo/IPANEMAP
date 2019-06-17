@@ -1,115 +1,133 @@
-
-import conf , FileFunctions as FF, Sampling as SP, StructureFunctions as SF, VisualizationTools as VT, ClustersTrait as CT, Optimize_clustering as OC
-import time,os,sys
+import time
+import os
+import sys
 from collections import defaultdict
+import conf
+import FileFunctions as FF
+import Sampling as SP
+import StructureFunctions as SF
+import VisualizationTools as VT
+import ClustersTrait as CT
+import Optimize_clustering as OC
+from Progress import progress
 
+# Create folders
+FF.CreateFold(conf.OutputFolder)
+FF.CreateFold(os.path.join(conf.OutputFolder, "tmp"))
+FF.CreateFold(os.path.join(conf.OutputFolder, "tmp", conf.PickledData))
 
-#Redirect all the print to an output Log file
-sys.stdout =conf.Logger(conf.OutputLogfile)
+# Redirects all the print to the output Log file
+sys.stdout = conf.Logger(os.path.join(conf.OutputFolder,conf.OutputLogfile))
 
+# ******************************** Generate sample of structures for all fasta files in the fastaShape/fastaConstraint folders
 
-#******************************** Generate sample of structures for all fasta files in the fastaShape/fastaConstraint folders
-# Specify  whether to generate new sample or use a previously  generated one
-
-if str.lower(conf.sampling)=="true":
-    print("Sampling Process for % s Structures" % (conf.numberofsruct))
-    OutputSamples = SP.StructSampling([conf.PathConstrainteFile, conf.PathConstrainteFileShape],conf.numberofsruct, conf.Temperature, conf.Fastaextenstion,conf.m,conf.b)
-else:
-    print ("Use of an existing sample for % s Structures" % (conf.numberofsruct))
-    OutputSamples = 'OutputSamples' + conf.numberofsruct
-
-#******************************** Treat all RNA sequences in the fasta folder
-for file in FF.GetListFile(conf.PathSequenceFasta, conf.FastaExtension):
-	print "RNAId ", "\t",file
-	startimebig = time.time()
+# ******************************** Treat all RNA sequences in the fasta folder
+for RNAName in FF.GetListFile(conf.PathRNAFASTA, conf.FASTAExtension):
+    progress.StartTask("Processing RNA %s" % (RNAName))
     # Get the rna sequence
-	rna = FF.Parsefile(os.path.join(conf.PathSequenceFasta, file + '.' + conf.FastaExtension))[1]
+    RNASequence = FF.Parsefile(os.path.join(conf.PathRNAFASTA, RNAName + '.' + conf.FASTAExtension))[1].strip()
 
     # Get probing conditions for the treated RNA
-	Probingconditions = [file + state for state in conf.constraintes]
-	print "The considered probing conditions are ", Probingconditions
-	# Create a global file that contains structures sampled from the list of Probing conditions
-	FF.MergeFiles(OutputSamples, os.path.join(OutputSamples, 'Samples.txt'), Probingconditions, 1)
+    ProbingConditions = [RNAName + state for state in conf.Conditions]
 
-	# Create a distance matrix file
-	SVMlFile = "DissimilarityMatrix" + conf.numberofsruct
-	startime = time.time()
+    # Specify  whether to generate new sample or use a previously  generated one
+    if str.lower(conf.Sampling) == "true":
+        progress.StartTask("Sampling %s structures for each condition" % (conf.SampleSize))
+        OutputSamples = SP.StructSampling([conf.PathConstraintsFile, conf.PathConstraintsFileShape],
+                                          ProbingConditions,
+                                          int(conf.SampleSize),
+                                          conf.Temperature, conf.m, conf.b)
+        progress.EndTask()
+    else:
+        progress.StartTask("Using existing sample of %s structures" % (conf.SampleSize))
+        OutputSamples = 'OutputSamples' + conf.SampleSize
+        progress.EndTask()
 
-	print("Distance Matrix generation for % d Structures" % (int(conf.numberofsruct) * len(Probingconditions)))
-	# Calculate distance and identify redundant structures within the same condition
-	SF.DistanceStruct(os.path.join(OutputSamples, 'Samples.txt'), SVMlFile, int(conf.numberofsruct), Probingconditions)
-	endtime = time.time()
-	print("End of distance calculation between the structures in the sample  %53f\t" % (endtime - startime))
+    progress.Print("Probing conditions: %s" % (ProbingConditions))
+    # Create a global file that contains structures sampled from the list of Probing conditions
+    FF.MergeFiles(OutputSamples, os.path.join(OutputSamples, 'Samples.txt'), ProbingConditions, SP.NUM_HEADER_LINES)
 
-	################################# Calculate Conditional Boltzmann probabilities
-	# for each condition, calculate Z over all non redundant structures and return a conditional Boltzmann probability for all structures with null value for redundant ones.
-	startime = time.time()
-	print ("Start Conditional  Boltzmann Probabilities calculation")
-	startime = time.time()
-	BoltzmanFactor = defaultdict(lambda: defaultdict())
-	ConditionalBoltzmaanProbability = defaultdict(lambda: defaultdict())
-	Zprobabilities = defaultdict(lambda: defaultdict())
-	Redondantestructure = FF.UnpickleVariable(os.path.join(conf.PickledData, "Redondantestructures_Id.pkl"))
-	ConditionalBoltzmaanProbability = SF.Boltzmann_Calc(Probingconditions, OutputSamples, int(conf.numberofsruct), rna,Redondantestructure)
-	endtime = time.time()
-	print ("Boltzmann probabilities Calculated with success in :  %53f\t" % (endtime - startime))
+    # Create a distance matrix file
+    progress.StartTask("Computing dissimilarity matrix")
+    SVMlFile = "DissimilarityMatrix" + conf.SampleSize
+    # Calculate distance and identify redundant structures within the same condition
+    SF.DistanceStruct(os.path.join(OutputSamples, 'Samples.txt'), SVMlFile, int(conf.SampleSize), ProbingConditions)
+    progress.EndTask()
 
-	################################# Clustering of structures based on their base pair distance
-	# Load the pickled dissimilarity matrix
-	DM = FF.UnpickleVariable(os.path.join(conf.PickledData, "dissmatrix.pkl"))
-	# Get the list of redundant structures
-	Redundant = []
-	Redundant=FF.UnpickleVariable(os.path.join(conf.PickledData,"Redondantestructures.pkl"))
-	BoltzmanFactor=FF.UnpickleVariable(os.path.join(conf.PickledData, "Boltzman.pkl"))
-	print "Start of the clustering process"
-	method= "MiniBatchKMean"
-	Clusters,CentroidStructure=OC.define_number_cluster(os.path.join("output", SVMlFile), Redundant, method, BoltzmanFactor, Probingconditions, rna)
-	#Get Clusters from Pickled data
-	#Clusters = FF.UnpickleVariable(os.path.join(conf.PickledData, "Clusters" + method + ".pkl"))
+    ################################# Calculate Conditional Boltzmann probabilities
+    # for each condition, calculate Z over all non redundant structures and return a conditional Boltzmann probability for all structures with null value for redundant ones.
+    progress.StartTask("Computing Boltzmann probabilities")
+    BoltzmanFactor = defaultdict(lambda: defaultdict())
+    ConditionalBoltzmannProbability = defaultdict(lambda: defaultdict())
+    Zprobabilities = defaultdict(lambda: defaultdict())
+    Redondantestructure = FF.UnpickleVariable("Redondantestructures_Id.pkl")
+    ConditionalBoltzmannProbability = SF.Boltzmann_Calc(ProbingConditions, OutputSamples, int(conf.SampleSize), RNASequence,
+                                                        Redondantestructure)
+    progress.EndTask()
 
-	# We should create an intermediate  file to be sure that  RNAeval  works!!
-	with open("filecentroide", "w")as Ctrdfile:
-		Ctrdfile.write(">RNA")
-		print CentroidStructure
-		for elem in (CentroidStructure.keys()):
-			Ctrdfile.write("\n%s" % (CentroidStructure[elem]))
-			print CentroidStructure[elem]
-	Centroids_Energies = SF.ENERGY_VALUES_STRUCTURES("filecentroide", rna)
-	print "Centroids_Energies", "\t", Centroids_Energies
-	CT.ClustersDistributions(Clusters, os.path.join("output", "Clusters_details"),Probingconditions, int(conf.numberofsruct))
+    ################################# Clustering of structures based on their base pair distance
+    progress.StartTask("Iterative clustering")
+    # Load the pickled dissimilarity matrix
+    DM = FF.UnpickleVariable("dissmatrix.pkl")
+    # Get the list of redundant structures
+    Redundant = []
+    Redundant = FF.UnpickleVariable("Redondantestructures.pkl")
+    BoltzmanFactor = FF.UnpickleVariable("Boltzman.pkl")
+    method = "MiniBatchKMean"
+    Clusters, CentroidStructure = OC.DefineNumberCluster(os.path.join(conf.OutputFolder,"tmp", SVMlFile), Redundant, method,
+                                                         DM, BoltzmanFactor, ProbingConditions, RNASequence)
+    # Get Clusters from Pickled data
+    # Clusters = FF.UnpickleVariable("Clusters" + method + ".pkl")
+    progress.EndTask()
 
-
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!Election of the best structures strating!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	# Calculate cumulated  Boltzmaan Energy for each cluster
-
-	CumulBE = {}
-	CardinalConditions = {}
+    progress.StartTask("Analyzing clusters")
+    # We should create an intermediate  file to be sure that  RNAeval  works!!
 
 
-	CumulBE = CT.CumulatedConditionalBoltzmannbyCluster(Clusters,  ConditionalBoltzmaanProbability, int(conf.numberofsruct), Probingconditions)
-	# epsilon= 1/(n+1)
-	Epsilon = 1 / float(len(Clusters)+1)
-	CardinalConditions = CT.GetCardinalConditions(Clusters,  ConditionalBoltzmaanProbability, Probingconditions,
-		                                                             int(conf.numberofsruct), Epsilon)
-	print 'verification pareto values'
-	print 'Cardinal condition values', CardinalConditions.values()
-	print 'Cumulated Boltzmann', "\t", CumulBE.values()
-	#print 'mean_distance_in_a_given_cluster', "\t", E.values()
-	# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Cluster analysis to elect the best cluster
-	Dict = {}  # a dictionary that contains the three variables characterizing clusters (Criteria of optimization)
-	for ClusterNumber in Clusters:
-		Dict[ClusterNumber] = [CardinalConditions[ClusterNumber],
-		                       CumulBE[ClusterNumber]]  #  only Two criterions are considered
+    centroidPath = os.path.join(conf.OutputFolder,"Centroids.fa")
+    SF.StructsToRNAEvalInput(CentroidStructure, centroidPath, RNASequence)
+    Centroids_Energies = SF.RunEval(centroidPath)
+
+    CT.ClustersDistributions(Clusters, os.path.join(conf.OutputFolder, "Clusters_details"), ProbingConditions,
+                             int(conf.SampleSize))
+
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!Election of the best structures starting!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # Calculate cumulated  Boltzmaan Energy for each cluster
+
+    CumulBE = {}
+    CardinalConditions = {}
+
+    CumulBE = CT.CumulatedConditionalBoltzmannbyCluster(Clusters, ConditionalBoltzmannProbability,
+                                                        int(conf.SampleSize), ProbingConditions)
+    # epsilon= 1/(n+1)
+    Epsilon = 1. / float(len(Clusters) + 1)
+    CardinalConditions = CT.GetCardinalConditions(Clusters, ConditionalBoltzmannProbability, ProbingConditions,
+                                                  int(conf.SampleSize), Epsilon)
+
+    for index in (CentroidStructure.keys()):
+        progress.Print("%s\t%s\t%s\t%s\t%s" % (index, CentroidStructure[index], Centroids_Energies[index],
+                                       CardinalConditions[index], CumulBE[index]))
 
 
+    progress.Print('Pareto optimal structure(s):')
 
-	ListOptimalClusters = CT.Pareto(Dict)
-	print "The elected clusters figuring in the Pareto front", ListOptimalClusters
+    # print 'mean_distance_in_a_given_cluster', "\t", E.values()
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Cluster analysis to elect the best cluster
+    Dict = {}  # a dictionary that contains the three variables characterizing clusters (Criteria of optimization)
+    for ClusterNumber in Clusters:
+        Dict[ClusterNumber] = [CardinalConditions[ClusterNumber],
+                               CumulBE[ClusterNumber]]  # only Two criterions are considered
 
-	Dominatedclusters = [clusteri for clusteri in Clusters if clusteri not in ListOptimalClusters]
-	Filealloptimalcentroides = os.path.join("Multiprobing/", str(Probingconditions)+ ".optimals")
-	#VT.Drawvarna(Filealloptimalcentroides, ListOptimalClusters, CentroidStructure, conf.numberofsruct,
-	#	         rna, Centroids_Energies, conf.SHAPEVis)
+    ListOptimalClusters = CT.Pareto(Dict)
+    progress.Print("Structure\tdG\t#SupportingConditions\tBoltzmannProbability",output=True)
+    for index in ListOptimalClusters:
+        progress.Print("%s\t%s\t%s\t%s" % (CentroidStructure[index], Centroids_Energies[index],
+                                       CardinalConditions[index], CumulBE[index]),output=True)
 
-	print " IPANEMAP has been run successfully"
-	print ("End of IPANEMAP analysis for a sampling of %s rna   % s structure for %s  conditions: %53f\t" % (file, int(conf.numberofsruct), len(Probingconditions), time.time() - startimebig))
+    progress.EndTask()
+
+    #DominatedClusters = [clusteri for clusteri in Clusters if clusteri not in ListOptimalClusters]
+    #Filealloptimalcentroides = os.path.join("Multiprobing/", str(ProbingConditions) + ".optimals")
+    # VT.Drawvarna(Filealloptimalcentroides, ListOptimalClusters, CentroidStructure, conf.numberofsruct,
+    #	         rna, Centroids_Energies, conf.SHAPEVis)
+    progress.EndTask()

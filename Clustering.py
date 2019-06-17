@@ -3,19 +3,24 @@ from collections import defaultdict
 from sklearn.datasets import load_svmlight_file
 from sklearn import cluster
 import FileFunctions as FF
-import sys, math, re,os
+import sys, math, re, os
 import conf
+from Progress import progress
 
 
-def FilterCluster(cluster,redundant):# function to eliminate redundant elements
-	return [elem for elem in cluster if elem not in redundant]
+def FilterCluster(cluster, redundant):  # function to eliminate redundant elements
+    return [elem for elem in cluster if elem not in redundant]
+
+
 def a():
     return []
-def MiniBatchKMeans(SVMLMatrix,n_clusters):
+
+
+def MiniBatchKMeans(SVMLMatrix, n_clusters):
     clusters = defaultdict(a)
-    #clusters_clean= defaultdict(a)
+    # clusters_clean= defaultdict(a)
     X, y = np.array(load_svmlight_file(SVMLMatrix))
-    #print X,y
+    # print X,y
     algorithm = cluster.MiniBatchKMeans(n_clusters=n_clusters)  # The cas eof 2 clusters is calculated
     algorithm.fit(X)
     if hasattr(algorithm, 'labels_'):
@@ -24,7 +29,7 @@ def MiniBatchKMeans(SVMLMatrix,n_clusters):
         y_pred = algorithm.predict(X)
     for i in range(len(y_pred)):
         clusters[y_pred[i]].append(i + 1)
-    #print clusters
+    # print clusters
     '''
     for elem in clusters:
         #print "clusters_properties", "\t", elem, "\t", len(clusters[elem])
@@ -33,7 +38,7 @@ def MiniBatchKMeans(SVMLMatrix,n_clusters):
     return clusters
 
 
-#The DIANA implementation is extracted from Vienna-Package code and adapted to our treatment
+# The DIANA implementation is extracted from Vienna-Package code and adapted to our treatment
 class DIANA:
     @staticmethod
     def doClustering(dissmatrix, structs, maxDiameter, maxAverageDiameter):
@@ -60,7 +65,6 @@ class DIANA:
         clusters = convertTreeToListOfClusters(c_root, structs)
 
         return clusters
-
 
 
 class Cluster:
@@ -194,16 +198,6 @@ def averageDissimilarity(index, cluster, dissMatrix):
     return avgDiss
 
 
-def objectIndexWithHighestDissimilarity(cluster, dissMatrix):
-    maxAvgDiss = 0.0
-    maxIndex = -1
-    for i1 in cluster:
-        avgDiss = averageDissimilarity(i1, cluster, dissMatrix)
-        if (avgDiss > maxAvgDiss):
-            maxAvgDiss = avgDiss
-            maxIndex = i1
-    return maxIndex
-
 
 def convertTreeToListOfClusters(clusterTree, structs, clusterList=[]):
     if len(clusterTree.childNodes) > 0:
@@ -227,14 +221,10 @@ def diameter(cluster, dissMatrix):
                 maxDist = dist
     return maxDist
 
-
-
-
-    @staticmethod
-    def printClusters(clusters):
-        cid = 0
-        for c in clusters:
-            cid += 1
-            print "ClusterID:", cid
-            for s in c:
-                print s
+def printClusters(clusters):
+    cid = 0
+    for c in clusters:
+        cid += 1
+        progress.Print("ClusterID: %s" % cid)
+        for s in c:
+            progress.Print(s)

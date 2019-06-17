@@ -1,10 +1,18 @@
-import FileFunctions as FF, conf
+import FileFunctions as FF
+import conf
+import Sampling as SP
+from Progress import progress
+
 import os
 from collections import defaultdict
 import numpy as np
+from collections import Counter
+
+
+
 # Base Pairs from dot bracket Secondary structure
 
-def ListBasePairsFromStruct(Struct):  # return dic={structure:[liste de pairs de base ],....}
+def BasePairsFromStruct(Struct):  # return dic={structure:[liste de pairs de base ],....}
     lista = []
     stack = []
     for i in range(len(Struct)):  # sequence length
@@ -13,38 +21,52 @@ def ListBasePairsFromStruct(Struct):  # return dic={structure:[liste de pairs de
         elif Struct[i] == ')':  # Closing base pair
             k = stack.pop()
             lista.append((k, i))
-    return lista
+    return set(lista)
+
 
 # Parse an RNAsubopt file to extract Base pairs
-def GetBasePairsFromStructFile(faPath):   #return dic={structure:[liste de pairs de base ],....}
-	#print faPath
-	DicStruct={}
-    	lines = FF.Parsefile(faPath)
-	#print lines
-    	SeqLen=len(lines[1])-1
-	#print SeqLen,"seq length"
-    	for j in range(len(lines)):
-		DicStruct[j]=ListBasePairsFromStruct(lines[j].strip().split(' ')[0])
-    	return len(lines),DicStruct
-from collections import Counter
+def GetBasePairsFromStructFile(faPath):  # return dic={structure:[liste de pairs de base ],....}
+    # print faPath
+    DicStruct = {}
+    lines = FF.Parsefile(faPath)
+    # print lines
+    SeqLen = len(lines[1])-1
+    # print SeqLen,"seq length"
+    rawStructs = []
+    for j in range(len(lines)):
+        sec_str = lines[j].strip().split(' ')[0]
+        rawStructs.append(sec_str)
+        DicStruct[j] = BasePairsFromStruct(sec_str)
+    progress.Print("Loaded %s structures (%s distinct)" % (len(rawStructs), len(set(rawStructs))))
+    return len(lines), DicStruct
+
+
 def OccurenceBasePairs(ListPairs, Threshold):
-    return [(elem[0],elem[1],Counter(ListPairs)[elem]) for elem in Counter(ListPairs)  if Counter(ListPairs)[elem]>=Threshold]
+    return [(elem[0], elem[1], Counter(ListPairs)[elem]) for elem in Counter(ListPairs) if
+            Counter(ListPairs)[elem] >= Threshold]
+
+
 def fromPairsToStruct(rna, Pairs):
-    structure=["." for i in range(len(rna)-1)]
-    for (i,j) in Pairs:
-        structure[i]='('
-        structure[j]=')'
+    structure = ["." for i in range(len(rna))]
+    for (i, j) in Pairs:
+        structure[i] = '('
+        structure[j] = ')'
     return "".join(structure)
 
-#Calculate distance between each 2 structures and generate a matrix 2 by 2 , stored in the file SVMLFile
-def DistanceTwoBPlist(Struct1,Struct2):
-	return len(set(Struct1).symmetric_difference(set(Struct2)) )
-	#return len(set(Struct1).intersection(set(Struct2)) )
+
+def DistanceTwoStructs(Struct1, Struct2):
+    return len(Struct1.symmetric_difference(Struct2))
+
+
+# return len(set(Struct1).intersection(set(Struct2)) )
 
 def dd():
     return 0
+
+
 def aa():
     return defaultdict(dd)
+
 
 def DistanceStruct(StructFile, SVMlFile, numberofsruct, constrainte):
     Redondantestructure = defaultdict(aa)
@@ -55,29 +77,33 @@ def DistanceStruct(StructFile, SVMlFile, numberofsruct, constrainte):
     for i in range(len(constrainte)):
         Dicnumberofsruct[constrainte[i]] = numberofsruct
 
-
     nb, DicStruct = GetBasePairsFromStructFile(StructFile)
 
+    progress.StartTask("Dissimilarity Loop")
     for i in range(0, nb):
         for j in range(i + 1, nb):
-            MatDist[i][j] = DistanceTwoBPlist(DicStruct[i], DicStruct[
-                j])
+            MatDist[i][j] = DistanceTwoStructs(DicStruct[i], DicStruct[j])
             MatDist[j][i] = MatDist[i][j]
+
             ####### Check for redundancy
             if MatDist[i][j] == 0:
-                jconstraint=int(j / numberofsruct)
-                if j not in Redondantestructure1 and int(i / numberofsruct)==jconstraint:# To be sure that the redundant  structure belongs to the same probing condition
+                jconstraint = int(j / numberofsruct)
+                if j not in Redondantestructure1 and int(
+                        i / numberofsruct) == jconstraint:  # To be sure that the redundant  structure belongs to the same probing condition
                     Dicnumberofsruct[constrainte[jconstraint]] -= 1
-                    Redondantestructure1.append((j,jconstraint))
+                    Redondantestructure1.append((j, jconstraint))
+    progress.EndTask()
 
-    for (elem,jconstraint) in Redondantestructure1:
+    progress.StartTask("Export dissimilarity matrix")
+    for (elem, jconstraint) in Redondantestructure1:
         StructureNumber = elem - jconstraint * numberofsruct
-        Redondantestructure[constrainte[jconstraint]][StructureNumber] = 1 # we mark redundant structures by value 1
+        Redondantestructure[constrainte[jconstraint]][StructureNumber] = 1  # we mark redundant structures by value 1
 
     # store the distance matrix in the  SVMLFile
-    if os.path.isfile(os.path.join("output",SVMlFile)):
-        os.remove(os.path.join("output",SVMlFile)) # To clean the previous version
-    o = open(os.path.join("output",SVMlFile), "w")
+    SVMLFullPath = os.path.join(conf.OutputFolder,"tmp", SVMlFile)
+    if os.path.isfile(SVMLFullPath):
+        os.remove(SVMLFullPath)  # To clean the previous version
+    o = open(SVMLFullPath, "w")
     for i in range(len(MatDist)):
         o.write("%i\t" % (i + 1))
         for j in range(len(MatDist)):
@@ -85,48 +111,59 @@ def DistanceStruct(StructFile, SVMlFile, numberofsruct, constrainte):
                 o.write("%i:%.4f\t" % (j + 1, MatDist[i][j]))
         o.write("\n")
     o.close()
+    progress.EndTask()
 
-    if Redondantestructure!=0:
-        print "Warning! redundant structures"
-    FF.PickleVariable(MatDist, os.path.join(conf.PickledData,"dissmatrix.pkl"))
-    FF.PickleVariable(Redondantestructure1, os.path.join(conf.PickledData,"Redondantestructures.pkl"))
-    FF.PickleVariable(Redondantestructure, os.path.join(conf.PickledData, "Redondantestructures_Id.pkl"))
-    FF.PickleVariable(Dicnumberofsruct,os.path.join(conf.PickledData,"Dicnumberofsruct.pkl"))
+    progress.StartTask("Pickle all data")
+    FF.PickleVariable(MatDist, "dissmatrix.pkl")
+    FF.PickleVariable(Redondantestructure1, "Redondantestructures.pkl")
+    FF.PickleVariable(Redondantestructure, "Redondantestructures_Id.pkl")
+    FF.PickleVariable(Dicnumberofsruct, "Dicnumberofsruct.pkl")
+    progress.EndTask()
     return 0
 
 
 def FromStructFiletoRNAEvalInput(StructFile, InputRNAeval, rna):
     lines = FF.Parsefile(StructFile)
-    o = open(InputRNAeval,
-             "w")  # geneate intermediate file with sequence+strcuture , seq+strcture .... as the input format  to use RNAeval
-    # print "sdfqspkojr",len(lines)
-    for i in range(1, len(lines)):
-        o.write("%s%s\t" % (rna, lines[i]))
+    StructsToRNAEvalInput(lines[SP.NUM_HEADER_LINES:], InputRNAeval, rna)
+
+
+def StructsToRNAEvalInput(Structs, OutFile, rna):
+    o = open(OutFile, "w")  # geneate intermediate file with sequence+strcuture , seq+strcture .... as the input format  to use RNAeval
+    for i in range(len(Structs)):
+        o.write("%s\n%s\n" % (rna, Structs[i]))
     o.close()
 
-#StructFile contains the RNA sequence in the first line and list of correponding structures by line
-def ENERGY_VALUES_STRUCTURES(StructFile,rna):
-    	Energy=[]
-    	#generate the rnaeval input file
-    	FromStructFiletoRNAEvalInput(StructFile,"InputRNAeval",rna)
-   	 # launch the RNaeval command
-        os.system('RNAeval <' + "InputRNAeval" + '>' + "energyvalues")
-    	# Parse the RNAevaloutput to extract energy values
-    	lines=FF.Parsefile("energyvalues")
-    	for i in xrange(1,len(lines),2):
-        	# i is the stucture number and 'lines[i].split(" ")[1][1:-2]' is  the  corresponding  energy value
-		#print 'holla',(lines[i].split(" ")[1][1:-2])
-		Energy.append(lines[i].split(" ",1)[1][1:-2]) # TODO ,1 is to get the first occrence of the space !!!
-    	return Energy
+
+# StructFile contains the RNA sequence in the first line and list of corresponding structures by line
+def EvalStructuresEnergies(StructFile, rna):
+    # generate the rnaeval input file
+    InputFile = os.path.join(conf.OutputFolder, "tmp", "InputRNAeval")
+    FromStructFiletoRNAEvalInput(StructFile, InputFile, rna)
+    return RunEval(InputFile)
+
+def RunEval(InputFile):
+    Energy = []
+    # launch the RNaeval command
+    energiesFile =  os.path.join(conf.OutputFolder, "tmp", "energyvalues")
+    os.system('RNAeval <' + InputFile + '>' + energiesFile)
+    # Parse the RNAevaloutput to extract energy values
+    lines = FF.Parsefile(energiesFile)
+    for i in xrange(1, len(lines), 2):
+        # i is the stucture number and 'lines[i].split(" ")[1][1:-2]' is  the  corresponding  energy value
+        # print 'holla',(lines[i].split(" ")[1][1:-2])
+        Energy.append(lines[i].split(" ", 1)[1][1:-2])  # TODO ,1 is to get the first occurence of the space !!!
+    return Energy
+
 
 ##Boltzmman energy   according to the formula B=exp^\frac{-e}{RT}
 def BoltzmannFactor(Energy):
-    T=37+273.15
-    R=0.0019872370936902486
-    #print np.exp(-float(Energy)/float(100.*R*T))
-    return np.exp(-float(Energy)/float(100.*R*T))
+    T = 37 + 273.15
+    R = 0.0019872370936902486
+    # print np.exp(-float(Energy)/float(100.*R*T))
+    return np.exp(-float(Energy) / float(100. * R * T))
 
-def Boltzmann_Calc(constraintes, StructfileRepository, numberofsruct,  rna, Redondantestructure):
+
+def Boltzmann_Calc(constraintes, StructfileRepository, NumStructures, rna, Redondantestructure):
     Energy = defaultdict(aa)
     Boltzman = defaultdict(aa)
     ConditionalBoltzman = defaultdict(aa)
@@ -134,32 +171,32 @@ def Boltzmann_Calc(constraintes, StructfileRepository, numberofsruct,  rna, Redo
     # Calculate estructure energies in each condition sample
     for Condition in constraintes:
         FileStructure = os.path.join(StructfileRepository, Condition)
-        Energy[Condition] = ENERGY_VALUES_STRUCTURES(FileStructure,rna)  # list of energy values for the structures present in the Condition
+        Energy[Condition] = EvalStructuresEnergies(FileStructure, rna)  # list of energy values for the structures present in the Condition
 
     for Condition in constraintes:
         ListwithoutRedundnacy = []
-        for i in range(numberofsruct):
+        for i in range(NumStructures):
             Boltzman[Condition][i] = BoltzmannFactor(Energy[Condition][i])
-            if Redondantestructure[Condition][i]==0:  # if the structure is not redundant
+            if Redondantestructure[Condition][i] == 0:  # if the structure is not redundant
                 ListwithoutRedundnacy.append(Boltzman[Condition][i])
 
         # Calculate the normalization term as the sum over all Boltzmann probabilities for one copy of each structure
         ZBolzman[Condition] = sum(ListwithoutRedundnacy)  # Partition function
 
-    #FF.PickleVariable(Boltzman, os.path.join(conf.PickledData, "Boltzman.pkl"))
+    # FF.PickleVariable(Boltzman, "Boltzman.pkl")
     listall = []
     for Condition in constraintes:  # to not count MFES
         lista = []
-        for i in range(numberofsruct):
-            if Redondantestructure[Condition][i]==0: # a npn redundnat structure
+        for i in range(NumStructures):
+            if Redondantestructure[Condition][i] == 0:  # a non redundnat structure
                 lista.append(Boltzman[Condition][i] / ZBolzman[Condition])
             else:
                 lista.append(0)  # Redundant structures have a conditional Boltzmann value NULL
         listall += lista
         ConditionalBoltzman[Condition] = lista
-        #print "Condition \t  ConditionalBoltzman", Condition, ConditionalBoltzman[Condition]
-    FF.PickleVariable(Boltzman, os.path.join(conf.PickledData, "Boltzman.pkl"))
-    FF.PickleVariable(ConditionalBoltzman, os.path.join(conf.PickledData, "ConditionalBoltzman.pkl"))
-    FF.PickleVariable(ZBolzman, os.path.join(conf.PickledData, "ZBolzman.pkl"))
+        # print "Condition \t  ConditionalBoltzman", Condition, ConditionalBoltzman[Condition]
+    FF.PickleVariable(Boltzman, "Boltzman.pkl")
+    FF.PickleVariable(ConditionalBoltzman, "ConditionalBoltzman.pkl")
+    FF.PickleVariable(ZBolzman, "ZBolzman.pkl")
 
     return ConditionalBoltzman
