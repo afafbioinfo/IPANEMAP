@@ -34,7 +34,7 @@ For an RNA having base name `{RNA}`, and a condition name `{Cond}`, IPANEMAP wil
       HardConstraintsDir: hard
       Conditions: DMSMG,NMIA
    
-the method will attempt to locate two files `5sRNADMSMG.txt` and `5sRNANMIA.txt` in each of the `soft` and `hard` directories.
+the method will attempt to locate, and use for the sampling phase, two files `5sRNADMSMG.txt` and `5sRNANMIA.txt` in each of the `soft` and `hard` directories.
 
  
 ### Input folders
