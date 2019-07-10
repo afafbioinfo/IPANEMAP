@@ -21,10 +21,10 @@ The method will run with a configuration specified within `IPANEMAP.cfg`, possib
 Most configuration options are set by modifying the content of the `IPANEMAP.cfg` file.
 
 ### Main options
- - `RNA`: Specifies a path (relative to the working directory) to a FASTA file where the nucleotides sequence of the main RNA of interest can be found. Note that the filename is important, as it will be used as a base names for the other input files. Example: `RNA: fasta_files/didymium.fa` will process the sequence found in the file, and `didymium` will be used as the base name of reactivities/hard contraints files (see `Conditions` option).
+ - `RNA`: Specifies a path (relative to the working directory) to a FASTA file where the nucleotides sequence of the main RNA of interest can be found. Note that the filename is important, as it will be used as a base names for the other input files. Example: `RNA: fasta_files/didymium.fa` will process the sequence found in the file, and `didymium` will be used as the *base name* of reactivities/hard contraints files (see `Conditions` option).
  - `HardConstraintsDir` and `SoftConstraintsDir`: Those options specify the directories where (optional) hard and soft (reactivities) constraints, associated with the various conditions, can be found.
- - `Conditions`: Can be used to specify the list of probing conditions used for the prediction. Should be set to a comma-separated list of conditions, i.e. the names of reactivity profiles/experiments to be considered for the structure prediction.
-Example: `Conditions: 1M7,1M7MG,NMIA` will jointly consider the three reactivities for the structure prediction.
+ - `Conditions`: Can be used to specify the list of probing conditions used for the prediction. Should be set to a comma-separated list of conditions, i.e. the names of reactivity profiles/experiments to be considered for the structure prediction. For a condition name `{Cond}`, the method will lead the method to  attempt to locate files named `{RNA}{Cond}.txt` in the `{HardConstraintsDir}` and `{SoftConstraintsDir}` folders, where `{RNA}` is the base name of the processed RNA.
+Example: `Conditions: 1M7,1M7MG,NMIA` will jointly consider the three conditions. For `RNA: ` is set to  `RNA1M7.txt,`
 
  
 ### Input folders
