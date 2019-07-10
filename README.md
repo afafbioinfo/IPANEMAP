@@ -17,6 +17,8 @@ Once all dependencies are satisfied, IPANEMAP can be invoked through:
 
 The method will run with a configuration specified within `IPANEMAP.cfg`, possibly overriding the list of considered conditions with the one provided through the optional command-line option `--conditions`.
 
+
+
 ## Configuration
 Most configuration options are set by modifying the content of the `IPANEMAP.cfg` file.
 
@@ -25,25 +27,31 @@ Most configuration options are set by modifying the content of the `IPANEMAP.cfg
  - `SoftConstraintsDir` and `HardConstraintsDir`: Those options specify the directories where soft (reactivities) and hard constraints files can be found (if available).
  - `Conditions`: Can be used to specify the list of probing conditions used for the prediction. Should be set to a comma-separated list of conditions, i.e. the names of reactivity profiles/experiments to be considered for the structure prediction. 
  
-For an RNA having base name `{RNA}`, and a condition name `{Cond}`, IPANEMAP will attempt to locate files named `{SoftConstraintsDir}/{RNA}{Cond}.txt` and `{HardConstraintsDir}/{RNA}{Cond}.txt`. If none of these files is found, the method resorts to a purely thermodynamic sampling.
+For an RNA having base name `{RNA}`, and a condition name `{Cond}`, IPANEMAP will attempt to locate files named `{SoftConstraintsDir}/{RNA}{Cond}.txt` and `{HardConstraintsDir}/{RNA}{Cond}.txt`. If none of these files is found, the method will rely on a purely thermodynamic sampling.
 
- Example: Given a configuration
+Example: Given a configuration
  
       RNA: fasta_files/5sRNA.fa
       SoftConstraintsDir: soft
       HardConstraintsDir: hard
       Conditions: DMSMG,NMIA
    
-the method will attempt to locate, and use for the sampling phase, two files `5sRNADMSMG.txt` and `5sRNANMIA.txt` in each of the `soft` and `hard` directories.
+the method will attempt to locate, and use for the sampling phase of the method, two files `5sRNADMSMG.txt` and `5sRNANMIA.txt` in each of the `soft` and `hard` directories.
 
- 
-### Input folders
- - `Constraints_probing`: contains constraint files with reactivity scores. For each probing condition, two files are required: `RnaCondition.fa` and `RnaConditionProbing.txt` where `RnaCondition.fa` is a `Fasta` format file (sequence) with the identifier `>Rnacondition(reagent name)`
- - `fasta_files`: Fasta-format file of the studied RNA `Rna.fa`
- - `Constraints_Hard`: Contains files with hard constraints
+### Paths-related options
+ - `WorkingDir`: Main output directory for temp files and final results
+ - `LogFile`: Name of file gathering the accumulated log
 
 ### Output folders
  - `Multiprobing` contains predicted structures (= optimal centroid structure) in dot-bracket format
  - `output` contains all the clustering properties
  - `logfile` lists all informations pertaining the sampling, clustering and Pareto selection processes
+
+## How to
+ - How do I perform a *pure thermodynamic*/constraints-free prediction? 
+ Simply make sure that no constraint file named `{RNA}{Cond}.txt` is found in either `{SoftConstraintsDir}` or `{HardConstraintsDir}`, and IPANEMAP will default to a purely thermodynamic sampling (you may safely ignore the warning).
+ - How do I specify a different sequence for some specific condition? 
+If a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file. This can be useful when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols).
+
+
 
