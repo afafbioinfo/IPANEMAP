@@ -17,7 +17,32 @@ Once all dependencies are satisfied, IPANEMAP can be invoked through:
 
 The method will run with a configuration specified within `IPANEMAP.cfg`, possibly overriding the list of considered conditions with the one provided through the optional command-line option `--conditions`.
 
+## Input files
 
+### Reactivity/soft constraints file format
+IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Cond}.txt`, where the meaning of the various variables is made clear below. The content of a reactivity file is simply a list of position/value pairs, of the form:
+
+      1	0.568309
+      2	0.179692
+      3	-999
+      4	0.568389
+           ....
+
+where values are expected to be normalized as to loosely fall in the [0,1] interval, with negative numbers indicating missing values.
+
+### Hard constraints file format
+Hard constraints allow to force predictions to be consistent with prio partial knowledge. They should be expressed in a file `{HardConstraintsDir}/{RNA}{Cond}.txt`, each file consisting of classic sequence/partial structure, expressed in dot-bracket notation.
+
+Example: The following file content
+
+      > Short RNA
+      CCCAAAUGGG
+      (.(....).)
+     
+indicates that two base pairs, corresponding to matching parentheses, should always be respected by the sampling phase (the rest remains fair game).
+
+
+### Hard constraints files
 
 ## Configuration
 Most configuration options are set by modifying the content of the `IPANEMAP.cfg` file.
@@ -40,18 +65,20 @@ Example: Given a configuration
    
 the method will attempt to locate, and use for the sampling phase of the method, two files `5sRNADMSMG.txt` and `5sRNANMIA.txt` in each of the `soft` and `hard` directories.
 
-### Misc options
- - `WorkingDir`: Main output directory for temp files and final results
- - `LogFile`: Name of file gathering the accumulated log
-
 ### Sampling options
  - `DoSampling`: If set to `true`, IPANEMAP will always re-generate a representative structural sample (even if one can already be found)
  - `NumStructures`: Number of structures per condition, generated to approximate the pseudo-Boltzmann ensemble
  - `Temperature`: Temperature (in Celsius) used for the sampling
  - `m` and `b`: Slope and intercept used in the *reactivity to pseudo-energy* conversion (see Deigan et al, PNAS 2009)
 
+### Misc options
+ - `WorkingDir`: Main output directory for temp files and final results
+ - `LogFile`: Name of file gathering the accumulated log
+
+
 ## How to
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
  Simply make sure that no constraint file named `{RNA}{Cond}.txt` is found in either `{SoftConstraintsDir}` or `{HardConstraintsDir}`, and IPANEMAP will default to a purely thermodynamic sampling (you may safely ignore the warning).
- - How do I specify a different sequence for some specific condition? 
-If a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file. This can be useful when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols).
+ - How do I specify a different sequence for some specific condition? This can be useful when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols).
+When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.
+For reactivity/SHAPE data files, if a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file. 
