@@ -3,7 +3,7 @@ from itertools import islice
 from os import listdir
 from os.path import isfile, join
 from Progress import progress
-import conf
+from conf import loadConfig
 
 # create folder if it doesn't exist
 def CreateFold(dir):
@@ -59,13 +59,22 @@ def parseReactivityfile(fileinput):
 
 
 def PickleVariable(variable, file):
+    conf = loadConfig()
     fileOut = open(os.path.join(conf.OutputFolder,"tmp", conf.PickledData, file), "wb")  # 'wb' instead 'w' for binary file
     pickle.dump(variable, fileOut, -1)  # -1 specifies highest binary protocol
     fileOut.close()
 
 
 def UnpickleVariable(file):
+    conf = loadConfig()
     fileIn = open(os.path.join(conf.OutputFolder,"tmp", conf.PickledData,  file), "rb")
     unpickled = pickle.load(fileIn)
     fileIn.close()
     return unpickled
+
+
+class IPANEMAPError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg

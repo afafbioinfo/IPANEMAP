@@ -14,10 +14,12 @@ class Progress:
         sys.stderr.write(self.getIndentTxt())
         if output:
             sys.stdout.write(txt)
+            if endl:
+                sys.stdout.write(os.linesep)
         else:
             sys.stderr.write(txt)
-        if endl:
-            sys.stderr.write(os.linesep)
+            if endl:
+                sys.stderr.write(os.linesep)
         self.immediate = False
 
 
@@ -38,6 +40,10 @@ class Progress:
         else:
             sys.stderr.write(self.getIndentTxt() + "[Done%s]"%(added) + os.linesep)
         self.immediate = False
+
+    def Flush(self):
+        while len(self.tasks)>0:
+            self.EndTask()
 
     def getIndentTxt(self):
         return "  "*len(self.tasks)

@@ -1,5 +1,5 @@
 import FileFunctions as FF
-import conf
+from conf import loadConfig
 import Sampling as SP
 from Progress import progress
 
@@ -7,8 +7,6 @@ import os
 from collections import defaultdict
 import numpy as np
 from collections import Counter
-
-
 
 # Base Pairs from dot bracket Secondary structure
 
@@ -69,6 +67,7 @@ def aa():
 
 
 def DistanceStruct(StructFile, SVMlFile, numberofsruct, constrainte):
+    conf = loadConfig()
     Redondantestructure = defaultdict(aa)
     MatDist = defaultdict(aa)
     Redondantestructure1 = []
@@ -137,6 +136,7 @@ def StructsToRNAEvalInput(Structs, OutFile, rna):
 # StructFile contains the RNA sequence in the first line and list of corresponding structures by line
 def EvalStructuresEnergies(StructFile, rna):
     # generate the rnaeval input file
+    conf = loadConfig()
     InputFile = os.path.join(conf.OutputFolder, "tmp", "InputRNAeval")
     FromStructFiletoRNAEvalInput(StructFile, InputFile, rna)
     return RunEval(InputFile)
@@ -144,6 +144,7 @@ def EvalStructuresEnergies(StructFile, rna):
 def RunEval(InputFile):
     Energy = []
     # launch the RNaeval command
+    conf = loadConfig()
     energiesFile =  os.path.join(conf.OutputFolder, "tmp", "energyvalues")
     os.system('RNAeval <' + InputFile + '>' + energiesFile)
     # Parse the RNAevaloutput to extract energy values

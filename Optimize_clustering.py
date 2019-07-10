@@ -4,7 +4,7 @@ from sklearn.datasets import load_svmlight_file
 from sklearn import cluster
 import FileFunctions as FF, Clustering as CL, StructureFunctions as SF
 import sys, math, re, os
-import conf
+from conf import loadConfig
 import ClustersTrait as CT
 from Progress import progress
 
@@ -21,6 +21,8 @@ def CumulatedBoltzmannsbyCluster(clusters, BoltzmanCluster, numberofsruct, const
 
 
 def DefineNumberCluster(SVMLMatrix, Redundant, method, DM, BoltzmanFactor, Probingconditions, rna):
+    conf = loadConfig()
+
     epsilon = 1  # Cetroid base pair distance threshold
 
     Cluster = defaultdict(lambda: defaultdict(CL.a))
