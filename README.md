@@ -43,7 +43,7 @@ indicates that two base pairs, corresponding to matching parentheses, should alw
 
 ## Output
 
-IPANEMAP typically produces a lot of messages during execution, to keep the user informaed of its progress.
+IPANEMAP typically produces a lot of messages during execution, to keep the user informed of its progress.
 However, only the final (Pareto) structural models are output to the standard output device. 
 This means that 
 
