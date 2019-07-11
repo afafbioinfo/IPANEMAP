@@ -41,8 +41,14 @@ Example: The following file content
      
 indicates that two base pairs, corresponding to matching parentheses, should always be respected by the sampling phase (the rest remains fair game).
 
+## Output
 
-### Hard constraints files
+IPANEMAP typically produces a lot of messages during execution, to keep the user informaed of its progress.
+However, only the final (Pareto) structural models are output to the standard output device. 
+This means that 
+
+      python IPANEMAP.py > finaloutput.fa
+
 
 ## Configuration
 Most configuration options are set by modifying the content of the `IPANEMAP.cfg` file.
