@@ -20,24 +20,24 @@ conf = None
 def loadConfig():
     def override(init, new):
         for x in vars(new):
-            vars(init)[x] = vars(new)[x]
+            if vars(new)[x] is not None:
+                vars(init)[x] = vars(new)[x]
     global conf
     if conf is None:
             conf = Namespace()
             # Connect to the config file
             config = SafeConfigParser()
-            config.read("IPANEMAP.Config")
+            config.read("IPANEMAP.cfg")
 
             # General Input
             conf.PathConstraintsFile = config.get("Input", "HardConstraintsDir")
             conf.PathConstraintsFileShape = config.get("Input", "SoftConstraintsDir")
-            conf.PathRNAFASTA = config.get("Input", "RNADir")
+            conf.RNA = config.get("Input", "RNA")
             conf.Conditions = [s.strip() for s in (config.get("Input", "Conditions")).split(',')]
             conf.PickledData = "PickledData"
 
             # Path section
             conf.OutputFolder = config.get("Paths", "WorkingDir")
-            conf.FASTAExtension = config.get("Paths", "FASTAExtension")
             conf.OutputLogfile = config.get("Paths", "LogFile")
 
             # Sampling section
@@ -46,24 +46,24 @@ def loadConfig():
             conf.Temperature = config.get("Sampling", "Temperature")
             conf.m = config.get("Sampling", "m")
             conf.b = config.get("Sampling", "b")
-            # VisualizedCondition = config.get("Sampling", "VisualizedCondition")
-            # cutoff = config.get("Sampling", "cutoffBasePairs")
-
 
             # Pareto Front section
             conf.percent = int(config.get("Pareto", "Percent"))
-            conf.CutoffZcondition = float(config.get("Pareto", "CutoffZCondition"))
+            conf.CutoffZcondition = float(config.get("Pareto", "ZCutoff"))
 
-            conf.maxDiameterThreshold = float(config.get("Clustering", "maxDiameterThreshold"))
-            conf.maxAverageDiameterThreshold = float(config.get("Clustering", "maxAverageDiameterThreshold"))
-
+            conf.maxDiameterThreshold = float(config.get("Clustering", "MaxDiameterThreshold"))
+            conf.maxAverageDiameterThreshold = float(config.get("Clustering", "MaxAverageDiameterThreshold"))
 
             # Load additional command line options
             parser = argparse.ArgumentParser(
-                description='IPANEMAP: Integrative Probing Analysis Informed by Multiple Accessibility Profiles')
-            parser.add_argument('--conditions', metavar='Cond', nargs='+', dest='Conditions',
-                                help='One or several conditions')
+                description='Integrative Probing Analysis Informed by Multiple Accessibility Profiles',
+                epilog="Further options can be set by editing IPANEMAP.cfg")
+            parser.add_argument('--RNA', metavar='r', dest='RNA',
+                                help='path to the RNA considered for the analysis (FASTA file)')
+            parser.add_argument('--cond', metavar='c', nargs='+', dest='Conditions',
+                                help='space-separated list of probing conditions')
             args = parser.parse_args()
+            print args
             override(conf, args)
 
     return conf

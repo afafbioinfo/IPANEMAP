@@ -6,47 +6,48 @@ from conf import loadConfig, Logger
 import FileFunctions as FF
 import Sampling as SP
 import StructureFunctions as SF
+import StructureFunctions as SF
 import VisualizationTools as VT
 import ClustersTrait as CT
 import Optimize_clustering as OC
 from Progress import progress
 
+FASTA_EXTENSION = "fa"
 
-conf = loadConfig()
+if __name__ == "__main__":
+    conf = loadConfig()
 
-# Create folders
-FF.CreateFold(conf.OutputFolder)
-FF.CreateFold(os.path.join(conf.OutputFolder, "tmp"))
-FF.CreateFold(os.path.join(conf.OutputFolder, "tmp", conf.PickledData))
+    # Create folders
+    FF.CreateFold(conf.OutputFolder)
+    FF.CreateFold(os.path.join(conf.OutputFolder, "tmp"))
+    FF.CreateFold(os.path.join(conf.OutputFolder, "tmp", conf.PickledData))
 
-# Redirects all the print to the output Log file
-sys.stdout = Logger(os.path.join(conf.OutputFolder,conf.OutputLogfile))
+    # Redirects all the print to the output Log file
+    sys.stdout = Logger(os.path.join(conf.OutputFolder,conf.OutputLogfile))
 
-# ******************************** Generate sample of structures for all fasta files in the fastaShape/fastaConstraint folders
+    # ******************************** Generate sample
 
-try:
-    # ******************************** Treat all RNA sequences in the fasta folder
-    for RNAName in FF.GetListFile(conf.PathRNAFASTA, conf.FASTAExtension):
-        defaultFasta = os.path.join(conf.PathRNAFASTA, RNAName+"."+conf.FASTAExtension)
+    try:
+        rna = os.path.split(conf.RNA)[-1]
+        RNAName = rna[:-(len(FASTA_EXTENSION)+1)]
         progress.StartTask("Processing RNA %s" % (RNAName))
         # Get the rna sequence
-        RNASequence = FF.Parsefile(os.path.join(conf.PathRNAFASTA, RNAName + '.' + conf.FASTAExtension))[1].strip()
+        RNASequence = FF.Parsefile(conf.RNA)[1].strip()
 
         # Get probing conditions for the treated RNA
         ProbingConditions = [RNAName + state for state in conf.Conditions]
 
         # Specify  whether to generate new sample or use a previously  generated one
-        if str.lower(conf.Sampling) == "true":
+        OutputSamples = 'OutputSamples' + conf.SampleSize
+        if str.lower(conf.Sampling) == "true" or not os.path.isdir(OutputSamples):
             progress.StartTask("Sampling %s structures for each condition" % (conf.SampleSize))
             OutputSamples = SP.StructSampling([conf.PathConstraintsFile, conf.PathConstraintsFileShape],
                                               ProbingConditions,
                                               int(conf.SampleSize),
-                                              conf.Temperature, conf.m, conf.b, defaultFasta)
+                                              conf.Temperature, conf.m, conf.b, conf.RNA)
             progress.EndTask()
         else:
-            progress.StartTask("Using existing sample of %s structures" % (conf.SampleSize))
-            OutputSamples = 'OutputSamples' + conf.SampleSize
-            progress.EndTask()
+            progress.Print("Using existing sample")
 
         progress.Print("Probing conditions: %s" % (ProbingConditions))
         # Create a global file that contains structures sampled from the list of Probing conditions
@@ -62,7 +63,7 @@ try:
         ################################# Calculate Conditional Boltzmann probabilities
         # for each condition, calculate Z over all non redundant structures and return a conditional Boltzmann probability for all structures with null value for redundant ones.
         progress.StartTask("Computing Boltzmann probabilities")
-        BoltzmanFactor = defaultdict(lambda: defaultdict())
+        BoltzmannFactor = defaultdict(lambda: defaultdict())
         ConditionalBoltzmannProbability = defaultdict(lambda: defaultdict())
         Zprobabilities = defaultdict(lambda: defaultdict())
         Redondantestructure = FF.UnpickleVariable("Redondantestructures_Id.pkl")
@@ -78,11 +79,11 @@ try:
         # Get the list of redundant structures
         Redundant = []
         Redundant = FF.UnpickleVariable("Redondantestructures.pkl")
-        BoltzmanFactor = FF.UnpickleVariable("Boltzman.pkl")
+        BoltzmannFactor = FF.UnpickleVariable("Boltzman.pkl")
         method = "MiniBatchKMean"
         Clusters, CentroidStructure = OC.DefineNumberCluster(os.path.join(conf.OutputFolder, "tmp", SVMlFile),
                                                              Redundant, method,
-                                                             DM, BoltzmanFactor, ProbingConditions, RNASequence)
+                                                             DM, BoltzmannFactor, ProbingConditions, RNASequence)
         # Get Clusters from Pickled data
         # Clusters = FF.UnpickleVariable("Clusters" + method + ".pkl")
         progress.EndTask()
@@ -90,7 +91,7 @@ try:
         progress.StartTask("Analyzing clusters")
         # We should create an intermediate  file to be sure that  RNAeval  works!!
 
-        centroidPath = os.path.join(conf.OutputFolder, "Centroids.fa")
+        centroidPath = os.path.join(conf.OutputFolder, "Centroids."+FASTA_EXTENSION)
         SF.StructsToRNAEvalInput(CentroidStructure, centroidPath, RNASequence)
         Centroids_Energies = SF.RunEval(centroidPath)
 
@@ -136,6 +137,6 @@ try:
         # VT.Drawvarna(Filealloptimalcentroides, ListOptimalClusters, CentroidStructure, conf.numberofsruct,
         #	         rna, Centroids_Energies, conf.SHAPEVis)
         progress.EndTask()
-except FF.IPANEMAPError as e:
-    progress.Print("Error: %s" % (e))
-    progress.Flush()
+    except FF.IPANEMAPError as e:
+        progress.Print("Error: %s" % (e))
+        progress.Flush()
