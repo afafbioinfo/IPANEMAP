@@ -13,9 +13,9 @@ IPANEMAP consists in a set of Python 2.7+ scripts, and requires the prior instal
 
 Once all dependencies are satisfied, IPANEMAP can be invoked through: 
 
-      python IPANEMAP.py [--conditions c1 c2 ...]
+      python IPANEMAP.py [--RNA rnafile.fa] [--cond c1 c2 ...]
 
-The method will run with a configuration specified within `IPANEMAP.cfg`, possibly overriding the list of considered conditions with the one provided through the optional command-line option `--conditions`.
+The method will run with a configuration specified within `IPANEMAP.cfg`, optionnally overriding the RNA using the `--RNA` command-line option, and the  list of conditions with the `--cond` option.
 
 ## Input files
 
