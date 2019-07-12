@@ -94,6 +94,11 @@ the method will attempt to locate, and use for the sampling phase of the method,
 ## How to...
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
  Simply make sure that no constraint file named `{RNA}{Cond}.txt` is found in either `{SoftConstraintsDir}` or `{HardConstraintsDir}`, and IPANEMAP will default to a purely thermodynamic sampling (you may safely ignore the warning).
+ 
+Example: Execute the following command with *no* file named `rnathermo.txt` in either of the constraints directories
+
+      IPANEMPA.py --RNA rna.fa --cond thermo
+ 
  - How do I specify a different sequence for some specific condition? This need arises when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols), and must be used for the sampling.
     - When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.
     - For reactivity/SHAPE data files, if a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file. 
