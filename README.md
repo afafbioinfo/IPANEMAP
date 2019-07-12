@@ -20,7 +20,11 @@ The method will run with a configuration specified within `IPANEMAP.cfg`, option
 ## Input files
 
 ### Reactivity/soft constraints file format
-IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Cond}.txt`, where the meaning of the various variables is made clear below. The content of a reactivity file is simply a list of position/value pairs, of the form:
+IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Cond}.txt`, where the meaning of the various variables is made clear below. The content of a reactivity file is simply a list of position/value pairs providing a reactivity for each position. 
+Values are expected to be loosely normalized as fall in the [0,1] interval, with negative numbers indicating missing values.
+
+
+Example:
 
       1	0.568309
       2	0.179692
@@ -28,26 +32,30 @@ IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Con
       4	0.568389
            ....
 
-where values are expected to be normalized as to loosely fall in the [0,1] interval, with negative numbers indicating missing values.
 
 ### Hard constraints file format
-Hard constraints allow to force predictions to be consistent with prior partial knowledge. They should be expressed in a file `{HardConstraintsDir}/{RNA}{Cond}.txt` in classic FASTA/DBN format (see example below), consisting of sequence/partial structure expressed in extended dot-bracket notation as per the [Vienna package syntax](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
+Hard constraints allow to force predictions to be consistent with prior partial knowledge. They should be expressed in a file `{HardConstraintsDir}/{RNA}{Cond}.txt` in classic FASTA/DBN format (see example below), consisting of sequence/constraint mask in extended dot-bracket notation supported by the [Vienna package syntax](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
 
 Example: The following file content
 
-      > Short RNA
+      > Some RNA
       CCCAAAUGGG
-      (.(....).)
+      (x(....)x)
      
-indicates that two base pairs, corresponding to matching parentheses `(` and `)`, should always be respected by the sampling phase. Any unpaired position, indicated by a dot `.`, remains unconstrained.
+indicates that two base pairs, corresponding to matching parentheses `(` and `)`, should always be respected by the sampling phase. Positions associated with `x` 
+Any unpaired position, indicated by a dot `.`, is not constrained in the folding.
+More complex features can be used, as described in the [Vienna package documentation](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
 
 ## Output
 
 IPANEMAP typically produces a lot of messages during execution, to keep the user informed of its progress.
 However, only the final (Pareto) structural models are output to the standard output device. 
-This means that 
+This means that, after running
 
       python IPANEMAP.py > finaloutput.fa
+
+the `finaloutput.fa` file will consist of lines of the form
+
 
 
 ## Configuration
@@ -82,7 +90,7 @@ the method will attempt to locate, and use for the sampling phase of the method,
  - `LogFile`: Name of file gathering the accumulated log
 
 
-## How to
+## How to...
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
  Simply make sure that no constraint file named `{RNA}{Cond}.txt` is found in either `{SoftConstraintsDir}` or `{HardConstraintsDir}`, and IPANEMAP will default to a purely thermodynamic sampling (you may safely ignore the warning).
  - How do I specify a different sequence for some specific condition? This can be useful when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols).
