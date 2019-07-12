@@ -54,7 +54,9 @@ def parseReactivityfile(fileinput):
     Reactvities = []
     lines = Parsefile(fileinput)
     for it in range(len(lines)):
-        Reactvities.append(lines[it].split("\t")[1])
+        data = lines[it].split()
+        if len(data)>1:
+            Reactvities.append(data[1])
     return Reactvities
 
 
@@ -72,6 +74,13 @@ def UnpickleVariable(file):
     fileIn.close()
     return unpickled
 
+
+def LocateSoftConstraintFile(rna, cond):
+    conf = loadConfig()
+    path = os.path.join(conf.PathConstraintsFileShape, rna + cond + ".txt")
+    if not os.path.isfile(path):
+        path = ""
+    return path
 
 class IPANEMAPError(Exception):
     def __init__(self, msg):

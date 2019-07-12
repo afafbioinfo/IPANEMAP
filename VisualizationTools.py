@@ -1,23 +1,19 @@
-import conf, FileFunctions as FF, StructureFunctions as SF
+import conf as CF, FileFunctions as FF, StructureFunctions as SF
 
 from collections import defaultdict
 import scipy, numpy as np, os
-import pickle as pl
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import pyplot as PLT
-from matplotlib import cm as CM
-from matplotlib import mlab as ML
-import matplotlib.cm as cm
-import matplotlib.patches as mpatches
-from matplotlib.collections import PatchCollection
-from matplotlib.pyplot import figure, show
-from matplotlib.pylab import *
+# import matplotlib.pyplot as plt
+# from matplotlib import pyplot as PLT
+# from matplotlib import cm as CM
+# import matplotlib.cm as cm
+# import matplotlib.patches as mpatches
+# from matplotlib.pylab import *
 
-from sklearn import manifold
-from sklearn import cluster, datasets
+# from sklearn import manifold
 from itertools import cycle
+
+import subprocess
 
 
 # Visualize the distribution of the structures into clusters, visualize the MFES
@@ -286,32 +282,37 @@ def plotClusteringDistribution(lenconstraint, Folder_name, Lenrna):
     fig.savefig('Eucledian_distance_dot_plot_Matrix.png')
 
 
-def Drawvarna(File1, Listclusters, CentroidStructure, numberofsruct, rna, Centroids_Energies, FileShape):
-    # c = canvas.canvas()
-    i = 0
-    with open(File1, "w") as OPt:
-        lista = []
-        for elem in Listclusters:
-            i = i + 1
-            # filename =  File1 + numberofsruct + "_" + str(elem)
-            # OPt.write("%s\n" % (CentroidStructure[elem][:-1]))
-            # Heatmap
-            lista += SF.BasePairsFromStruct(CentroidStructure[elem])
+# def ShowCentroidsVARNA(CentroidsFile, Listclusters, CentroidStructure, numberofsruct, rna, Centroids_Energies, FileShape):
+#     # c = canvas.canvas()
+#     i = 0
+#     with open(CentroidsFile, "w") as OPt:
+#         lista = []
+#         for elem in Listclusters:
+#             i = i + 1
+#             lista += SF.BasePairsFromStruct(CentroidStructure[elem])
+#
+#             # Varna call
+#             drawStructure(filename, FileShape, filename + ".eps")
+#             c.insert(epsfile.epsfile(0, i * 40, filename + ".eps"))
+#     # return c, lista
 
-            # Varna call
-            with open(filename, "w")as outt:
-                outt.write(">Seq\n%s\n%s" % (rna, CentroidStructure[elem]))
-            drawStructure(filename, FileShape, filename + ".eps")
-            c.insert(epsfile.epsfile(0, i * 40, filename + ".eps"))
-    # return c, lista
+#COLOR_MAP = ' -colorMapStyle "-5.00:#4747B6,0.00:#4747FF,0.40:#1CFF47,0.70:#FF4747,2.41:#FFFF00"'
+COLOR_MAP = ' -colorMapStyle "heat"'
+
+def drawStructure(Sequence, Structure, Shapefile, OutFile):
+    conf = CF.loadConfig()
+    cmopt = ""
+    #print "shape",Shapefile
+    if os.path.isfile(Shapefile):
+        vals = FF.parseReactivityfile(Shapefile)
+        cmopt = ' -colorMap "' + ";".join(["%.3f" % float(v) for v in vals]) + '"' + COLOR_MAP
+    dummyout = os.path.join(conf.OutputFolder, "tmp", "varnamsg.txt")
+    cmd = 'java -cp VARNAv3-93.jar fr.orsay.lri.varna.applications.VARNAcmd -sequenceDBN "%s" -structureDBN "%s" '%(Sequence, Structure) + cmopt + ' -algorithm line -o ' + OutFile
+    #print cmd
+    subprocess.call(cmd, stdin=None, stdout=open(dummyout, 'wb'),
+                    stderr=open(dummyout, 'w'), shell=True)
 
 
-def drawStructure(Sequence, Shapefile, outfile):
-    lines = ""
-    f = FF.Parsefile(Shapefile)
-    lines = ";".join(["%.3f" % float(line.strip().split('\t')[1]) for line in f])
-    cmd = 'java -cp VARNAv3-93.jar fr.orsay.lri.varna.applications.VARNAcmd -i ' + Sequence + ' -colorMap ' + '"' + lines + '"' + ' -colorMapStyle ' + '"-5.00:#4747B6,0.00:#4747FF,0.40:#1CFF47,0.70:#FF4747,2.41:#FFFF00"' + ' -algorithm line -o ' + outfile + " > /dev/null"
-    os.system(cmd)
 
 
 def Convert2DDict_npArray(dic):

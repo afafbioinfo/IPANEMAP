@@ -31,6 +31,9 @@ if __name__ == "__main__":
         rna = os.path.split(conf.RNA)[-1]
         RNAName = rna[:-(len(FASTA_EXTENSION)+1)]
         progress.StartTask("Processing RNA %s" % (RNAName))
+        if not os.path.isfile(conf.RNA):
+            raise FF.IPANEMAPError("Input file '%s' not found"%(conf.RNA))
+
         # Get the rna sequence
         RNASequence = FF.Parsefile(conf.RNA)[1].strip()
 
@@ -88,7 +91,7 @@ if __name__ == "__main__":
         # Clusters = FF.UnpickleVariable("Clusters" + method + ".pkl")
         progress.EndTask()
 
-        progress.StartTask("Analyzing clusters")
+        progress.StartTask("Analyzing clusters/Drawing centroids")
         # We should create an intermediate  file to be sure that  RNAeval  works!!
 
         centroidPath = os.path.join(conf.OutputFolder, "Centroids."+FASTA_EXTENSION)
@@ -111,9 +114,19 @@ if __name__ == "__main__":
         CardinalConditions = CT.GetCardinalConditions(Clusters, ConditionalBoltzmannProbability, ProbingConditions,
                                                       int(conf.SampleSize), Epsilon)
 
+        ImageFolder = os.path.join(conf.OutputFolder, "img")
+        if not os.path.isdir(ImageFolder):
+            os.mkdir(ImageFolder)
+
+        ProbingPath = ""
+        if conf.ShowProbing:
+            cond = conf.Conditions[0]
+            ProbingPath = FF.LocateSoftConstraintFile(RNAName, cond)
+
         for index in (CentroidStructure.keys()):
-            progress.Print("%s\t%s\t%s\t%s\t%s" % (index, CentroidStructure[index], Centroids_Energies[index],
+            progress.Print("%s\t%s\t%s\t%s\t%s" % (index+1, CentroidStructure[index], Centroids_Energies[index],
                                                    CardinalConditions[index], CumulBE[index]))
+            VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Centroid-%s.svg"%(index+1)))
 
         progress.Print('Pareto optimal structure(s):')
 
@@ -126,10 +139,12 @@ if __name__ == "__main__":
 
         ListOptimalClusters = CT.Pareto(Dict)
         progress.Print("Structure\tdG\t#SupportingConditions\tBoltzmannProbability", output=True)
+        i = 0
         for index in ListOptimalClusters:
             progress.Print("%s\t%s\t%s\t%s" % (CentroidStructure[index], Centroids_Energies[index],
                                                CardinalConditions[index], CumulBE[index]), output=True)
-
+            VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Optimal-%s.svg"%(i+1)))
+            i += 1
         progress.EndTask()
 
         # DominatedClusters = [clusteri for clusteri in Clusters if clusteri not in ListOptimalClusters]

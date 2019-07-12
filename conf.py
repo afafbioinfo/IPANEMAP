@@ -51,8 +51,14 @@ def loadConfig():
             conf.percent = int(config.get("Pareto", "Percent"))
             conf.CutoffZcondition = float(config.get("Pareto", "ZCutoff"))
 
+            # Clustering section
             conf.maxDiameterThreshold = float(config.get("Clustering", "MaxDiameterThreshold"))
             conf.maxAverageDiameterThreshold = float(config.get("Clustering", "MaxAverageDiameterThreshold"))
+
+            # Visualization section
+            conf.DrawModels = config.get("Visualization", "DrawModels")
+            conf.DrawCentroids = config.get("Visualization", "DrawCentroids")
+            conf.ShowProbing = config.get("Visualization", "ShowProbing")
 
             # Load additional command line options
             parser = argparse.ArgumentParser(
@@ -63,7 +69,6 @@ def loadConfig():
             parser.add_argument('--cond', metavar='c', nargs='+', dest='Conditions',
                                 help='space-separated list of probing conditions')
             args = parser.parse_args()
-            print args
             override(conf, args)
 
     return conf
