@@ -103,7 +103,7 @@ IPANEMAP currently relies on VARNA to produce
  
 Example: Execute the following command with *no* file named `rnathermo.txt` in either of the constraints directories
 
-      Python2.7 IPANEMAP.py --RNA rna.fa --cond thermo
+      python2.7 IPANEMAP.py --RNA rna.fa --cond thermo
  
  - How do I specify a different sequence for some specific condition? This need arises when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols), and must be used for the sampling.
     - When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.
