@@ -48,13 +48,14 @@ More complex constraints are available, as described in the [Vienna package docu
 
 ## Output
 
-IPANEMAP typically produces a lot of messages during execution, to keep the user informed of its progress.
-However, only the final (Pareto) structural models are output to the standard output device. 
-This means that, after running
+IPANEMAP typically produces many messages during execution, to keep the user informed of its progress.
+However, only the final (Pareto) structural models are output to the standard output, meaning that, after running
 
       python IPANEMAP.py > finaloutput.fa
 
-the `finaloutput.fa` file will consist of lines of the form
+the `finaloutput.fa` file will only consist of the final models.
+
+Example: Input:GGGAAACCCAAAGGGAAACCC
 
 
 
@@ -62,7 +63,7 @@ the `finaloutput.fa` file will consist of lines of the form
 Most configuration options are set by modifying the content of the `IPANEMAP.cfg` file.
 
 ### Main options
- - `RNA`: Specifies a path (relative to the working directory) to a FASTA file where the nucleotides sequence of the main RNA of interest can be found. Note that the filename is important, as it will be used as a base names for the other input files. Example: `RNA: fasta_files/didymium.fa` will process the sequence found in the file, and `didymium` will be used as the *base name* of reactivities/hard contraints files (see `Conditions` option)
+ - `RNA`: Specifies a path (relative to the working directory) to a FASTA file where the nucleotide sequence of the main RNA of interest can be found. Note that the filename is important, as it will be used as a base names for the other input files. Example: `RNA: fasta_files/didymium.fa` will process the sequence found in the file, and `didymium` will be used as the *base name* of reactivities/hard contraints files (see `Conditions` option)
  - `SoftConstraintsDir` and `HardConstraintsDir`: Those options specify the directories where soft (reactivities) and hard constraints files can be found (if available)
  - `Conditions`: Can be used to specify the list of probing conditions used for the prediction. Should be set to a comma-separated list of conditions, i.e. the names of reactivity profiles/experiments to be considered for structure prediction
  
