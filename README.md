@@ -13,7 +13,7 @@ IPANEMAP consists in a set of Python 2.7+ scripts, and requires the prior instal
 
 Once all dependencies are satisfied, IPANEMAP can be invoked through: 
 
-      python IPANEMAP.py [--RNA rnafile.fa] [--cond c1 c2 ...]
+      python2.7 IPANEMAP.py [--RNA rnafile.fa] [--cond c1 c2 ...]
 
 The method will run with a configuration specified within `IPANEMAP.cfg`, optionnally overriding the RNA using the `--RNA` command-line option, and the  list of conditions with the `--cond` option.
 
@@ -21,7 +21,7 @@ The method will run with a configuration specified within `IPANEMAP.cfg`, option
 
 ### Reactivity/soft constraints file format
 IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Cond}.txt`, where the meaning of the various variables is made clear below. The content of a reactivity file is simply a list of position/value pairs providing a reactivity for each position. 
-Values are expected to be loosely normalized as fall in the [0,1] interval, with negative numbers indicating missing values.
+Values are expected to be loosely normalized, and fall in the [0,1] interval (except for a few outliers), with negative numbers mainly indicating missing values.
 
 
 Example:
@@ -46,16 +46,17 @@ indicates that two base pairs, corresponding to matching parentheses `(` and `)`
 Positions associated with `x` will be forced to remain unpaired, but positions associated with a dot `.` are not constrained in the folding.
 More complex constraints are available, as described in the [Vienna package documentation](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
 
-## Output
+## Outputs
 
+### Basic output
 IPANEMAP typically produces many messages during execution, to keep the user informed of its progress.
 However, only the final (Pareto) structural models are output to the standard output, meaning that, after running
 
-      python IPANEMAP.py > finaloutput.fa
+      python2.7 IPANEMAP.py > finaloutput.fa
 
 the `finaloutput.fa` file will only consist of the final models.
 
-Example: Input:GGGAAACCCAAAGGGAAACCC
+Example: For an input sequence `GGGAAACCCAAAGGGAAACCC`, running the above command will lead to the production of 
 
 
 
@@ -90,6 +91,11 @@ the method will attempt to locate, and use for the sampling phase of the method,
  - `WorkingDir`: Main output directory for temp files, and final results of the analysis. Directory  will be created if non-existent.
  - `LogFile`: Name of file gathering the accumulated log. File will be created if non-existent.
 
+### Visualization options
+IPANEMAP currently relies on VARNA to produce
+ - `DrawModels`: If set to `true`, uses VARNA to draw the final, Pareto-optimal, secondary structure models.
+ - `DrawCentroids`: If set to `true`, uses VARNA to draw the final, Pareto-optimal, secondary structure models.
+ - `ShowProbing`: If set to `true`, uses VARNA to draw the final, Pareto-optimal, secondary structure models.
 
 ## How to...
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
@@ -97,7 +103,7 @@ the method will attempt to locate, and use for the sampling phase of the method,
  
 Example: Execute the following command with *no* file named `rnathermo.txt` in either of the constraints directories
 
-      IPANEMPA.py --RNA rna.fa --cond thermo
+      Python2.7 IPANEMAP.py --RNA rna.fa --cond thermo
  
  - How do I specify a different sequence for some specific condition? This need arises when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols), and must be used for the sampling.
     - When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.
