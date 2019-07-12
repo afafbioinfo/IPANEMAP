@@ -307,7 +307,7 @@ def drawStructure(Sequence, Structure, Shapefile, OutFile):
         vals = FF.parseReactivityfile(Shapefile)
         cmopt = ' -colorMap "' + ";".join(["%.3f" % float(v) for v in vals]) + '"' + COLOR_MAP
     dummyout = os.path.join(conf.OutputFolder, "tmp", "varnamsg.txt")
-    cmd = 'java -cp VARNAv3-93.jar fr.orsay.lri.varna.applications.VARNAcmd -sequenceDBN "%s" -structureDBN "%s" '%(Sequence, Structure) + cmopt + ' -algorithm line -o ' + OutFile
+    cmd = 'java -cp VARNAv3-93.jar fr.orsay.lri.varna.applications.VARNAcmd  -bpStyle simple -sequenceDBN "%s" -structureDBN "%s" '%(Sequence, Structure) + cmopt + ' -algorithm line -o ' + OutFile
     #print cmd
     subprocess.call(cmd, stdin=None, stdout=open(dummyout, 'wb'),
                     stderr=open(dummyout, 'w'), shell=True)

@@ -90,12 +90,12 @@ def DistanceStruct(StructFile, SVMlFile, numberofsruct, constrainte):
                 if j not in Redondantestructure1 and int(
                         i / numberofsruct) == jconstraint:  # To be sure that the redundant  structure belongs to the same probing condition
                     Dicnumberofsruct[constrainte[jconstraint]] -= 1
-                    Redondantestructure1[j] =jconstraint
+                    Redondantestructure1[j] = jconstraint
     progress.EndTask()
 
     progress.StartTask("Export dissimilarity matrix")
-    for elem  in Redondantestructure1:
-        jconstraint = Redondantestructure1[j]
+    for elem in Redondantestructure1:
+        jconstraint = Redondantestructure1[elem]
         StructureNumber = elem - jconstraint * numberofsruct
         Redondantestructure[constrainte[jconstraint]][StructureNumber] = 1  # we mark redundant structures by value 1
 
@@ -115,7 +115,7 @@ def DistanceStruct(StructFile, SVMlFile, numberofsruct, constrainte):
 
     progress.StartTask("Pickle all data")
     FF.PickleVariable(MatDist, "dissmatrix.pkl")
-    FF.PickleVariable([(j,Redondantestructure1[j]) for j in Redondantestructure1], "Redondantestructures.pkl")
+    FF.PickleVariable(list(Redondantestructure1.keys()), "Redondantestructures.pkl")
     FF.PickleVariable(Redondantestructure, "Redondantestructures_Id.pkl")
     FF.PickleVariable(Dicnumberofsruct, "Dicnumberofsruct.pkl")
     progress.EndTask()
