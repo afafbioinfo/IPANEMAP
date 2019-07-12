@@ -42,9 +42,9 @@ Example: The following file content
       CCCAAAUGGG
       (x(....)x)
      
-indicates that two base pairs, corresponding to matching parentheses `(` and `)`, should always be respected by the sampling phase. Positions associated with `x` 
-Any unpaired position, indicated by a dot `.`, is not constrained in the folding.
-More complex features can be used, as described in the [Vienna package documentation](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
+indicates that two base pairs, corresponding to matching parentheses `(` and `)`, should always be respected by the models. 
+Positions associated with `x` will be forced to remain unpaired, but positions associated with a dot `.` are not constrained in the folding.
+More complex constraints are available, as described in the [Vienna package documentation](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
 
 ## Output
 
