@@ -52,13 +52,16 @@ More complex constraints are available, as described in the [Vienna package docu
 IPANEMAP typically produces many messages during execution, to keep the user informed of its progress.
 However, only the final (Pareto) structural models are output to the standard output, meaning that, after running
 
-      python2.7 IPANEMAP.py > finaloutput.fa
+      python2.7 IPANEMAP.py > output.dat
+      
+the `output.dat` file will only consist of the final models.
 
-the `finaloutput.fa` file will only consist of the final models.
+Example: For an input sequence `GGGAAACCCAAAGGGAAACCC`, and probing profile assigning high accessibilities to `A`s, running the above command will lead to the production of a file `output.dat`, having content
 
-Example: For an input sequence `GGGAAACCCAAAGGGAAACCC`, running the above command will lead to the production of 
+    Structure   dG      #SupportingConditions   BoltzmannProbability
+    (((...)))...(((...)))        -4.3   1       0.5735037115553154
 
-
+where each line consists of a secondary structure model, its thermodynamic stability, its number of supporting conditions, and its cumulated Boltzmann probability across conditions. Here the single probing condition implies a single model, but multiple structures may be produced in a multi-probing setting.
 
 ## Configuration
 Most configuration options are set by modifying the content of the `IPANEMAP.cfg` file.
@@ -94,8 +97,8 @@ the method will attempt to locate, and use for the sampling phase of the method,
 ### Visualization options
 IPANEMAP currently relies on VARNA to produce
  - `DrawModels`: If set to `true`, uses VARNA to draw the final, Pareto-optimal, secondary structure models.
- - `DrawCentroids`: If set to `true`, uses VARNA to draw the final, Pareto-optimal, secondary structure models.
- - `ShowProbing`: If set to `true`, uses VARNA to draw the final, Pareto-optimal, secondary structure models.
+ - `DrawCentroids`: If set to `true`, uses VARNA to draw the centroids associated with all of the clusters.
+ - `ShowProbing`:  If set to `true`, uses the reactivities of *the first probing condition* (as specified to the `cond` option, or  `Conditions` section of the config file) to annotate the secondary structure drawings.
 
 ## How to...
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
