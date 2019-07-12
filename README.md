@@ -31,7 +31,7 @@ IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Con
 where values are expected to be normalized as to loosely fall in the [0,1] interval, with negative numbers indicating missing values.
 
 ### Hard constraints file format
-Hard constraints allow to force predictions to be consistent with prio partial knowledge. They should be expressed in a file `{HardConstraintsDir}/{RNA}{Cond}.txt`, each file consisting of classic sequence/partial structure, expressed in dot-bracket notation.
+Hard constraints allow to force predictions to be consistent with prior partial knowledge. They should be expressed in a file `{HardConstraintsDir}/{RNA}{Cond}.txt` in classic FASTA/DBN format (see example below), consisting of sequence/partial structure expressed in extended dot-bracket notation as per the [Vienna package syntax](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
 
 Example: The following file content
 
@@ -39,7 +39,7 @@ Example: The following file content
       CCCAAAUGGG
       (.(....).)
      
-indicates that two base pairs, corresponding to matching parentheses, should always be respected by the sampling phase (the rest remains fair game).
+indicates that two base pairs, corresponding to matching parentheses `(` and `)`, should always be respected by the sampling phase. Any unpaired position, indicated by a dot `.`, remains unconstrained.
 
 ## Output
 
