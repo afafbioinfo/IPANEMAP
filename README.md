@@ -15,12 +15,14 @@ Once all dependencies are satisfied, IPANEMAP can be invoked through:
 
       python2.7 IPANEMAP.py [--RNA rnafile.fa] [--cond c1 c2 ...]
 
-The method will run with a configuration specified within `IPANEMAP.cfg`, optionnally overriding the RNA using the `--RNA` command-line option, and the  list of conditions with the `--cond` option.
+The method will run with a configuration specified within `IPANEMAP.cfg`, optionnally overriding the RNA using the `--RNA` command-line option, and the  list of conditions with the `--cond` option (see below for more details).
 
 ## Input files
 
 ### Reactivity/soft constraints file format
-IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Cond}.txt`, where the meaning of the various variables is made clear below. The content of a reactivity file is simply a list of position/value pairs providing a reactivity for each position. 
+IPANEMAP expects to find reactivities for a condition `{Cond}` in  a file `{SoftConstraintsDir}/{RNA}{Cond}.txt`, where `{RNA}` is the name of the chosen RNA (ie the name of the input FASTA file, minus its extension), and `{SoftConstraintsDir}` is the general folder where reactivities are located. 
+
+The content of a reactivity file is simply a list of position/value pairs providing a reactivity for each position. 
 Values are expected to be loosely normalized, and fall in the [0,1] interval (except for a few outliers), with negative numbers mainly indicating missing values.
 
 
