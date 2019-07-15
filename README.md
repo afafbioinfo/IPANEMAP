@@ -111,7 +111,8 @@ IPANEMAP currently relies on VARNA to produce
       python2.7 IPANEMAP.py --RNA rna.fa --cond thermo
  
  - How do I specify a different sequence for some specific condition? This need arises when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols), and must be used for the sampling.
-    - When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.
- **Example:** For an RNA file `myRNA.fa` and a condition name of `SHAPE`, the sequence found in a `{HardConstraintsDir}/myRNASHAPE.txt` file, will be used for the sampling instead of the one found in `myRNA.fa`.
-    - For reactivity/SHAPE data files, if a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file. **Example:** For an RNA  `rib.fa` and a condition name `1M7`, the sequence found at `{SoftConstraintsDir}/rib1M7.fa` will be used for the sampling instead of the one found in `rib.fa`.
+    - When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.  
+     **Example:** For an RNA file `myRNA.fa` and a condition name of `SHAPE`, the sequence found in a `{HardConstraintsDir}/myRNASHAPE.txt` file, will be used for the sampling instead of the one found in `myRNA.fa`.
+    - For reactivity/SHAPE data files, if a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file.  
+    **Example:** For an RNA  `rib.fa` and a condition name `1M7`, the sequence found at `{SoftConstraintsDir}/rib1M7.fa` will be used for the sampling instead of the one found in `rib.fa`.
  
