@@ -24,7 +24,7 @@ IPANEMAP expects to find reactivities in  a file `{SoftConstraintsDir}/{RNA}{Con
 Values are expected to be loosely normalized, and fall in the [0,1] interval (except for a few outliers), with negative numbers mainly indicating missing values.
 
 
-Example:
+**Example:**
 
       1	0.568309
       2	0.179692
@@ -36,7 +36,7 @@ Example:
 ### Hard constraints file format
 Hard constraints allow to force predictions to be consistent with prior partial knowledge. They should be expressed in a file `{HardConstraintsDir}/{RNA}{Cond}.txt` in classic FASTA/DBN format (see example below), consisting of sequence/constraint mask in extended dot-bracket notation supported by the [Vienna package syntax](https://www.tbi.univie.ac.at/RNA/RNAfold.1.html).
 
-Example: The following file content
+**Example**: The following file content
 
       > Some RNA
       CCCAAAUGGG
@@ -56,7 +56,7 @@ However, only the final (Pareto) structural models are output to the standard ou
       
 the `output.dat` file will only consist of the final models.
 
-Example: For an input sequence `GGGAAACCCAAAGGGAAACCC`, and probing profile assigning high accessibilities to `A`s, running the above command will lead to the production of a file `output.dat`, having content
+**Example:** For an input sequence `GGGAAACCCAAAGGGAAACCC`, and probing profile assigning high accessibilities to `A`s, running the above command will lead to the production of a file `output.dat`, having content
 
     Structure   dG      #SupportingConditions   BoltzmannProbability
     (((...)))...(((...)))        -4.3   1       0.5735037115553154
@@ -73,7 +73,7 @@ Most configuration options are set by modifying the content of the `IPANEMAP.cfg
  
 For an RNA having base name `{RNA}`, and a condition name `{Cond}`, IPANEMAP will attempt to locate files named `{SoftConstraintsDir}/{RNA}{Cond}.txt` and `{HardConstraintsDir}/{RNA}{Cond}.txt`. If none of these files is found, the method will rely on a purely thermodynamic sampling.
 
-Example: Given a configuration
+**Example:** Given a configuration
  
       [Input] 
       RNA: fasta_files/5sRNA.fa
@@ -104,7 +104,7 @@ IPANEMAP currently relies on VARNA to produce
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
  Simply make sure that no constraint file named `{RNA}{Cond}.txt` is found in either `{SoftConstraintsDir}` or `{HardConstraintsDir}`, and IPANEMAP will default to a purely thermodynamic sampling (you may safely ignore the warning).
  
-Example: Execute the following command with *no* file named `rnathermo.txt` in either of the constraints directories
+**Example:** Execute the following command with *no* file named `rnathermo.txt` in either of the constraints directories
 
       python2.7 IPANEMAP.py --RNA rna.fa --cond thermo
  
