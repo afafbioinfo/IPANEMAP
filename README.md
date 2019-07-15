@@ -105,7 +105,7 @@ IPANEMAP currently relies on VARNA to produce
 ## How to...
  - How do I perform a *pure thermodynamic*/constraints-free prediction? 
  Simply make sure that no constraint file named `{RNA}{Cond}.txt` is found in either `{SoftConstraintsDir}` or `{HardConstraintsDir}`, and IPANEMAP will default to a purely thermodynamic sampling (you may safely ignore the warning).  
- **Example:** Execute the command `python2.7 IPANEMAP.py --RNA rna.fa --cond thermo` with *no* file named `rnathermo.txt` in either of the constraints directories will run a pure thermodynamic prediction.
+ **Example:** Executing the command `python2.7 IPANEMAP.py --RNA rna.fa --cond thermo` with *no* file named `rnathermo.txt` in either of the constraints directories will run a pure thermodynamic prediction.
  - How do I specify a different sequence for some specific condition? This need arises when minor variants of the original sequence have been probed (eg Mutate-and-Map protocols), and must be used for the sampling.
     - When available, hard constraint files already specify a sequence, which is used instead of the main FASTA file for the sampling.  
      **Example:** For an RNA file `myRNA.fa` and a condition name of `SHAPE`, the sequence found in a `{HardConstraintsDir}/myRNASHAPE.txt` file, will be used for the sampling instead of the one found in `myRNA.fa`.
