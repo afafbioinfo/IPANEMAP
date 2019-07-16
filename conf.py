@@ -56,9 +56,9 @@ def loadConfig():
             conf.maxAverageDiameterThreshold = float(config.get("Clustering", "MaxAverageDiameterThreshold"))
 
             # Visualization section
-            conf.DrawModels = config.get("Visualization", "DrawModels")
-            conf.DrawCentroids = config.get("Visualization", "DrawCentroids")
-            conf.ShowProbing = config.get("Visualization", "ShowProbing")
+            conf.DrawModels = (config.get("Visualization", "DrawModels").lower()=="true")
+            conf.DrawCentroids = (config.get("Visualization", "DrawCentroids").lower()=="true")
+            conf.ShowProbing = (config.get("Visualization", "ShowProbing").lower()=="true")
 
             # Load additional command line options
             parser = argparse.ArgumentParser(

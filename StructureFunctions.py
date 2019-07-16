@@ -161,8 +161,8 @@ def RunEval(InputFile):
 def BoltzmannFactor(Energy):
     T = 37 + 273.15
     R = 0.0019872370936902486
-    # print np.exp(-float(Energy)/float(100.*R*T))
-    return np.exp(-float(Energy) / float(100. * R * T))
+    val = np.exp(-float(Energy) / float(100. * R * T))
+    return val
 
 
 def Boltzmann_Calc(constraintes, StructfileRepository, NumStructures, rna, Redondantestructure):
@@ -170,7 +170,7 @@ def Boltzmann_Calc(constraintes, StructfileRepository, NumStructures, rna, Redon
     Boltzman = defaultdict(aa)
     ConditionalBoltzman = defaultdict(aa)
     ZBolzman = defaultdict(aa)
-    # Calculate estructure energies in each condition sample
+    # Calculate structure energies in each condition sample
     for Condition in constraintes:
         FileStructure = os.path.join(StructfileRepository, Condition)
         Energy[Condition] = EvalStructuresEnergies(FileStructure, rna)  # list of energy values for the structures present in the Condition
@@ -193,7 +193,7 @@ def Boltzmann_Calc(constraintes, StructfileRepository, NumStructures, rna, Redon
             if Redondantestructure[Condition][i] == 0:  # a non redundnat structure
                 lista.append(Boltzman[Condition][i] / ZBolzman[Condition])
             else:
-                lista.append(0)  # Redundant structures have a conditional Boltzmann value NULL
+                lista.append(0.)  # Redundant structures have a conditional Boltzmann value NULL
         listall += lista
         ConditionalBoltzman[Condition] = lista
         # print "Condition \t  ConditionalBoltzman", Condition, ConditionalBoltzman[Condition]

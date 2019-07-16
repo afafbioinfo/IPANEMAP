@@ -126,7 +126,8 @@ if __name__ == "__main__":
         for index in (CentroidStructure.keys()):
             progress.Print("%s\t%s\t%s\t%s\t%s" % (index+1, CentroidStructure[index], Centroids_Energies[index],
                                                    CardinalConditions[index], CumulBE[index]))
-            VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Centroid-%s.svg"%(index+1)))
+            if conf.DrawCentroids:
+                VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Centroid-%s.svg"%(index+1)))
 
         progress.Print('Pareto optimal structure(s):')
 
@@ -143,7 +144,8 @@ if __name__ == "__main__":
         for index in ListOptimalClusters:
             progress.Print("%s\t%s\t%s\t%s" % (CentroidStructure[index], Centroids_Energies[index],
                                                CardinalConditions[index], CumulBE[index]), output=True)
-            VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Optimal-%s.svg"%(i+1)))
+            if conf.DrawModels:
+                VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Optimal-%s.svg"%(i+1)))
             i += 1
         progress.EndTask()
 
