@@ -41,7 +41,7 @@ if __name__ == "__main__":
         ProbingConditions = [RNAName + state for state in conf.Conditions]
 
         # Specify  whether to generate new sample or use a previously  generated one
-        OutputSamples = 'OutputSamples' + conf.SampleSize
+        OutputSamples = os.path.join(conf.OutputFolder, "tmp",'OutputSamples' )+ conf.SampleSize
         if str.lower(conf.Sampling) == "true" or not os.path.isdir(OutputSamples):
             progress.StartTask("Sampling %s structures for each condition" % (conf.SampleSize))
             OutputSamples = SP.StructSampling([conf.PathConstraintsFile, conf.PathConstraintsFileShape],
@@ -92,7 +92,7 @@ if __name__ == "__main__":
         progress.EndTask()
 
         progress.StartTask("Analyzing clusters/Drawing centroids")
-        # We should create an intermediate  file to be sure that  RNAeval  works!!
+ 
 
         centroidPath = os.path.join(conf.OutputFolder, "Centroids."+FASTA_EXTENSION)
         SF.StructsToRNAEvalInput(CentroidStructure, centroidPath, RNASequence)
@@ -130,9 +130,7 @@ if __name__ == "__main__":
                 VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Centroid-%s.svg"%(index+1)))
 
         progress.Print('Pareto optimal structure(s):')
-
-        # print 'mean_distance_in_a_given_cluster', "\t", E.values()
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Cluster analysis to elect the best cluster
+        
         Dict = {}  # a dictionary that contains the three variables characterizing clusters (Criteria of optimization)
         for ClusterNumber in Clusters:
             Dict[ClusterNumber] = [CardinalConditions[ClusterNumber],
@@ -148,12 +146,7 @@ if __name__ == "__main__":
                 VT.drawStructure(RNASequence, CentroidStructure[index], ProbingPath, os.path.join(ImageFolder, "Optimal-%s.svg"%(i+1)))
             i += 1
         progress.EndTask()
-
-        # DominatedClusters = [clusteri for clusteri in Clusters if clusteri not in ListOptimalClusters]
-        # Filealloptimalcentroides = os.path.join("Multiprobing/", str(ProbingConditions) + ".optimals")
-        # VT.Drawvarna(Filealloptimalcentroides, ListOptimalClusters, CentroidStructure, conf.numberofsruct,
-        #	         rna, Centroids_Energies, conf.SHAPEVis)
-        progress.EndTask()
+        
     except FF.IPANEMAPError as e:
         progress.Print("Error: %s" % (e))
         progress.Flush()
