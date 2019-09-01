@@ -1,26 +1,11 @@
 import conf as CF, FileFunctions as FF, StructureFunctions as SF
-
-from collections import defaultdict
 import scipy, numpy as np, os
 
-# import matplotlib.pyplot as plt
-# from matplotlib import pyplot as PLT
-# from matplotlib import cm as CM
-# import matplotlib.cm as cm
-# import matplotlib.patches as mpatches
-# from matplotlib.pylab import *
-
-# from sklearn import manifold
 from itertools import cycle
 
-import subprocess
 
-
-# Visualize the distribution of the structures into clusters, visualize the MFES
-# The 2D plan is the distance matrix [sklearn is called to plot the distribution], the Z axis is the Boltzmannprobabilty
-# The MFEs structures are filtred by the end of this process
 def ThreeD_MatDistance_Boltzmann(MatDist, Klust, Boltzmannprobabilty, numberofsruct, constrainte, MFEs):
-    # clusters=defaultdict(aa)
+    
     colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
     fig_handle = plt.figure()
     ax1 = fig_handle.add_subplot(111, projection='3d')
@@ -60,7 +45,6 @@ def ThreeD_MatDistance_Boltzmann(MatDist, Klust, Boltzmannprobabilty, numberofsr
 
     return 0
 
-
 # To eminitae the MFEs structures
 def FilterClusters(Klust, lenconst):
     for C in range(len(Klust)):
@@ -70,16 +54,6 @@ def FilterClusters(Klust, lenconst):
         if Klust[C] == ' ':
             del (Klust[C])
     return Klust
-
-
-# To resolve the problem of pickling a defaultdict!!
-def dd():
-    return 0
-
-
-def aa():
-    return defaultdict(dd)
-
 
 def threedcentoids(MatDist, Centroids_Energies, ListDiameters):
     colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
@@ -107,8 +81,7 @@ def threedcentoids(MatDist, Centroids_Energies, ListDiameters):
     ax.set_zlabel('Boltzmann energy Centroids')
     ax.set_title('Clusters distances with centoid s Boltzmann energies')
     fig_handle.savefig('centroids_distribution.svg')
-
-
+    
 def plotDistanceClusters(D, clusters, coloro, title):
     Dic = {}
     for elem in clusters:
@@ -133,7 +106,6 @@ def plotDistanceClusters(D, clusters, coloro, title):
 
     fig.savefig('Distance_clusters_' + title + '.png')
 
-
 def plotPareto(paretoPoints, dominatedPoints):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -148,7 +120,6 @@ def plotPareto(paretoPoints, dominatedPoints):
     ax.plot_trisurf(triang, pp[:, 2], color='mediumvioletred')
     plt.show()
 
-
 def plotPairs(lista, n):
     fig = PLT.figure()
     x = [elem[0] for elem in lista]
@@ -159,8 +130,6 @@ def plotPairs(lista, n):
     PLT.axis([min(x) - 1, max(x) + 1, min(y) - 1, max(y) + 1])
     cb = PLT.colorbar()
     cb.set_label('Probability value  in all  optimal centroids')
-    # PLT.show()
-
 
 def plotClustercBECard(clusternumber, cBE, cardinal, xlabelo, ylabelo, output):
     Labels = clusternumber
@@ -180,7 +149,6 @@ def plotClustercBECard(clusternumber, cBE, cardinal, xlabelo, ylabelo, output):
         ax.text(X[i] + 0.2, Y[i], i + 1, fontsize=10, horizontalalignment='center', color='b')
     plt.plot(X, Y, 'r*')
     fig.savefig(output)
-
 
 def plotsecodnarystructures(rnaString, lista, lista2, n, reactivities):
     fig = plt.figure()
@@ -248,7 +216,6 @@ def plotsecodnarystructures(rnaString, lista, lista2, n, reactivities):
     plt.savefig("res.eps", format='eps', dpi=1000)
     fig.savefig('Arcs_structures.svg')
 
-
 def plotClusteringDistribution(lenconstraint, Folder_name, Lenrna):
     D = scipy.zeros([lenconstraint, lenconstraint])
     Dic, B = SF.Load_Probabilities(Folder_name)
@@ -281,22 +248,6 @@ def plotClusteringDistribution(lenconstraint, Folder_name, Lenrna):
     # plt.show()
     fig.savefig('Eucledian_distance_dot_plot_Matrix.png')
 
-
-# def ShowCentroidsVARNA(CentroidsFile, Listclusters, CentroidStructure, numberofsruct, rna, Centroids_Energies, FileShape):
-#     # c = canvas.canvas()
-#     i = 0
-#     with open(CentroidsFile, "w") as OPt:
-#         lista = []
-#         for elem in Listclusters:
-#             i = i + 1
-#             lista += SF.BasePairsFromStruct(CentroidStructure[elem])
-#
-#             # Varna call
-#             drawStructure(filename, FileShape, filename + ".eps")
-#             c.insert(epsfile.epsfile(0, i * 40, filename + ".eps"))
-#     # return c, lista
-
-#COLOR_MAP = ' -colorMapStyle "-5.00:#4747B6,0.00:#4747FF,0.40:#1CFF47,0.70:#FF4747,2.41:#FFFF00"'
 COLOR_MAP = ' -colorMapStyle "heat"'
 
 def drawStructure(Sequence, Structure, Shapefile, OutFile):
@@ -311,10 +262,7 @@ def drawStructure(Sequence, Structure, Shapefile, OutFile):
     #print cmd
     subprocess.call(cmd, stdin=None, stdout=open(dummyout, 'wb'),
                     stderr=open(dummyout, 'w'), shell=True)
-
-
-
-
+    
 def Convert2DDict_npArray(dic):
     return np.array([[dic[i][j] for j in sorted(dic[i])] for i in sorted(dic)])
 
@@ -336,22 +284,10 @@ def HeatMapplot(Distance, labels, ConvertDist):
 
     # turn off the frame
     ax.set_frame_on(False)
-
-    # put the major ticks at the middle of each cell
-    # ax.set_yticks(np.arange(nba_sort.shape[0]) + 0.5, minor=False)
-    # ax.set_xticks(np.arange(nba_sort.shape[1]) + 0.5, minor=False)
-
     # want a more natural, table-like display
     ax.invert_yaxis()
     ax.xaxis.tick_top()
 
-    # Set the labels
-
-    # note I could have used nba_sort.columns but made "labels" instead
-    # ax.set_xticklabels(labels, minor=False)
-    # ax.set_yticklabels(labels, minor=False)
-
-    # rotate the
     plt.xticks(rotation=90)
 
     ax.grid(False)
@@ -365,4 +301,4 @@ def HeatMapplot(Distance, labels, ConvertDist):
     for t in ax.yaxis.get_major_ticks():
         t.tick1On = False
         t.tick2On = False
-    # plt.show()
+
