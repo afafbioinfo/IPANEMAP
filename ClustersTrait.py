@@ -144,10 +144,11 @@ def backtracking(W, BPp, rna, P_ss, i, j, pair):
                     backtracking(W, BPp, rna, P_ss, i, k, pair)
                     backtracking(W, BPp, rna, P_ss, k + 1, j, pair)
                     return pair
+    
     elif abs(i-j) <= 1:
         return pair
     raise Exception("Missing case in backtrack")
-
+    
 
 def MEA(BPp, rna):
     pair = []
