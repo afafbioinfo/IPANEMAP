@@ -246,9 +246,9 @@ def plotClusteringDistribution(lenconstraint, Folder_name, Lenrna):
             bbox=dict(boxstyle='round,pad=0.5', fc='green', alpha=0.5),
             arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
     # plt.show()
-    fig.savefig('Eucledian_distance_dot_plot_Matrix.png')
+    fig.savefig('Euclidian_distance_dot_plot_Matrix.png')
 
-COLOR_MAP = ' -colorMapStyle "heat"'
+COLOR_MAP = ' -colorMapStyle "$-20:#A0A0A0;$-10.01:#A0A0A0;$-10:#FFFFFF;$-2.02:#FFFFFF;$-2:#FFFF00;$0:#FFFF00;3:#FF0000"'
 
 def drawStructure(Sequence, Structure, Shapefile, OutFile):
     conf = CF.loadConfig()
