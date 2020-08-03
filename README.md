@@ -126,5 +126,5 @@ IPANEMAP currently relies on VARNA to produce
  
  ## Citation
 Please cite:
-A. Saaidi, D. Allouche, M. Regnier, B. Sargueil, Y.Ponty. IPANEMAP: Integrative Probing Analysis of Nucleic Acids Empowered by Multiple Accessibility Profiles, NAR(2020), [!link](https://doi.org/10.1093/nar/gkaa607)
+A. Saaidi, D. Allouche, M. Regnier, B. Sargueil, Y.Ponty. IPANEMAP: Integrative Probing Analysis of Nucleic Acids Empowered by Multiple Accessibility Profiles, NAR(2020), [link](https://doi.org/10.1093/nar/gkaa607)
 
