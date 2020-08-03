@@ -124,3 +124,7 @@ IPANEMAP currently relies on VARNA to produce
     - For reactivity/SHAPE data files, if a FASTA file named `{RNA}{Cond}.fa` is found in either of the condition directories, then its sequence will be used instead of the main FASTA file.  
     **Example:** For an RNA  `rib.fa` and a condition name `1M7`, the sequence found at `{SoftConstraintsDir}/rib1M7.fa` will be used for the sampling instead of the one found in `rib.fa`.
  
+ ## Citation
+Please cite:
+A. Saaidi, D. Allouche, M. Regnier, B. Sargueil, Y.Ponty. IPANEMAP: Integrative Probing Analysis of Nucleic Acids Empowered by Multiple Accessibility Profiles, NAR(2020), [!link](https://doi.org/10.1093/nar/gkaa607)
+
